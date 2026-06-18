@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>오늘뭐먹지 - 관리자</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .admin-header { background: #1a252f; }
+        .tab-menu { display: flex; gap: 4px; margin-bottom: 20px; }
+        .tab-btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 6px 6px 0 0;
+            cursor: pointer;
+            font-size: 0.9rem;
+            background: #dde;
+            color: #555;
+            font-family: inherit;
+        }
+        .tab-btn.active { background: #4a90d9; color: white; }
+    </style>
+</head>
+<body>
+
+<header class="header admin-header">
+    <a class="logo" href="09_admin.html">⚙ 오늘뭐먹지 관리자</a>
+    <nav class="nav">
+        <a href="01_main.html">← 메인 사이트</a>
+        <span class="user-name">관리자님 (ADMIN)</span>
+        <a href="05_login.html">로그아웃</a>
+    </nav>
+</header>
+
+<div class="container">
+    <div class="page-title">관리자 페이지</div>
+
+    <!-- 통계 요약 -->
+    <div style="display:grid; grid-template-columns: repeat(4, 1fr); gap:16px; margin-bottom:28px;">
+        <div class="card text-center" style="padding:20px;">
+            <div style="font-size:1.8rem; font-weight:bold; color:#4a90d9;">128</div>
+            <div class="text-muted text-sm mt-8">전체 회원</div>
+        </div>
+        <div class="card text-center" style="padding:20px;">
+            <div style="font-size:1.8rem; font-weight:bold; color:#e74c3c;">2</div>
+            <div class="text-muted text-sm mt-8">탈퇴 신청</div>
+        </div>
+        <div class="card text-center" style="padding:20px;">
+            <div style="font-size:1.8rem; font-weight:bold; color:#27ae60;">342</div>
+            <div class="text-muted text-sm mt-8">전체 게시글</div>
+        </div>
+        <div class="card text-center" style="padding:20px;">
+            <div style="font-size:1.8rem; font-weight:bold; color:#f39c12;">1,204</div>
+            <div class="text-muted text-sm mt-8">전체 댓글</div>
+        </div>
+    </div>
+
+    <!-- 탭 -->
+    <div class="tab-menu">
+        <button class="tab-btn active" type="button" data-tab="tab-member">회원 관리</button>
+        <button class="tab-btn" type="button" data-tab="tab-withdraw">탈퇴 신청<span class="tab-badge">2</span></button>
+        <button class="tab-btn" type="button" data-tab="tab-post">게시글 관리</button>
+        <button class="tab-btn" type="button" data-tab="tab-comment">댓글 관리</button>
+    </div>
+
+    <!-- 탭1: 회원 관리 -->
+    <div class="tab-content active" id="tab-member">
+        <div class="card" style="padding:0; overflow:hidden;">
+            <div style="padding:16px 20px; border-bottom:1px solid #eee; display:flex; justify-content:space-between; align-items:center;">
+                <strong>회원 목록</strong>
+                <form action="#" method="get" class="flex gap-8">
+                    <input class="form-control" type="text" name="keyword" placeholder="이름·이메일 검색" style="width:200px; padding:6px 10px;">
+                    <button class="btn btn-primary btn-sm" type="submit">검색</button>
+                </form>
+            </div>
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>번호</th>
+                        <th>아이디</th>
+                        <th>이름</th>
+                        <th>이메일</th>
+                        <th>가입 유형</th>
+                        <th>가입일</th>
+                        <th>관리</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>1</td>
+                        <td>hong123</td>
+                        <td>홍길동</td>
+                        <td>hong@email.com</td>
+                        <td><span class="badge badge-primary">일반</span></td>
+                        <td>2025.04.01</td>
+                        <td><button class="btn btn-danger btn-sm">강제탈퇴</button></td>
+                    </tr>
+                    <tr>
+                        <td>2</td>
+                        <td>—</td>
+                        <td>김철수</td>
+                        <td>kim@kakao.com</td>
+                        <td><span class="badge" style="background:#fff3cd; color:#856404;">카카오</span></td>
+                        <td>2025.04.05</td>
+                        <td><button class="btn btn-danger btn-sm">강제탈퇴</button></td>
+                    </tr>
+                    <tr>
+                        <td>3</td>
+                        <td>—</td>
+                        <td>이영희</td>
+                        <td>lee@gmail.com</td>
+                        <td><span class="badge" style="background:#fde8e8; color:#c0392b;">구글</span></td>
+                        <td>2025.04.10</td>
+                        <td><button class="btn btn-danger btn-sm">강제탈퇴</button></td>
+                    </tr>
+                    <tr>
+                        <td>4</td>
+                        <td>park_mj</td>
+                        <td>박민준</td>
+                        <td>park@email.com</td>
+                        <td><span class="badge badge-primary">일반</span></td>
+                        <td>2025.04.15</td>
+                        <td><button class="btn btn-danger btn-sm">강제탈퇴</button></td>
+                    </tr>
+                    <tr>
+                        <td>5</td>
+                        <td>choi_sj</td>
+                        <td>최수진</td>
+                        <td>choi@email.com</td>
+                        <td><span class="badge badge-primary">일반</span></td>
+                        <td>2025.04.20</td>
+                        <td><button class="btn btn-danger btn-sm">강제탈퇴</button></td>
+                    </tr>
+                </tbody>
+            </table>
+            <!-- 페이지네이션 -->
+            <div class="pagination" style="padding:16px;">
+                <a class="page-btn" href="#">◀</a>
+                <a class="page-btn active" href="#">1</a>
+                <a class="page-btn" href="#">2</a>
+                <a class="page-btn" href="#">3</a>
+                <a class="page-btn" href="#">▶</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- 탭2: 탈퇴 신청 -->
+    <div class="tab-content" id="tab-withdraw">
+        <div class="card" style="padding:0; overflow:hidden;">
+            <div style="padding:16px 20px; border-bottom:1px solid #eee;">
+                <strong>탈퇴 신청 회원</strong>
+                <span class="text-muted text-sm">— 승인하면 회원과 모든 데이터가 완전히 삭제됩니다</span>
+            </div>
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>번호</th>
+                        <th>아이디</th>
+                        <th>이름</th>
+                        <th>이메일</th>
+                        <th>가입일</th>
+                        <th>처리</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>11</td>
+                        <td>lee_old</td>
+                        <td>이순신</td>
+                        <td>lee.old@email.com</td>
+                        <td>2025.03.02</td>
+                        <td><button class="btn btn-danger btn-sm">탈퇴 승인(삭제)</button></td>
+                    </tr>
+                    <tr>
+                        <td>23</td>
+                        <td>—</td>
+                        <td>강감찬</td>
+                        <td>kang@kakao.com</td>
+                        <td>2025.03.18</td>
+                        <td><button class="btn btn-danger btn-sm">탈퇴 승인(삭제)</button></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- 탭3: 게시글 관리 -->
+    <div class="tab-content" id="tab-post">
+        <div class="card" style="padding:0; overflow:hidden;">
+            <div style="padding:16px 20px; border-bottom:1px solid #eee;">
+                <strong>최근 게시글</strong>
+            </div>
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>번호</th>
+                        <th>제목</th>
+                        <th>작성자</th>
+                        <th>별점</th>
+                        <th>좋아요</th>
+                        <th>작성일</th>
+                        <th>관리</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>5</td>
+                        <td><a href="02_detail.html" style="color:#4a90d9; text-decoration:none;">을지로 노포 곱창집, 진짜 현지 맛이에요</a></td>
+                        <td>홍길동</td>
+                        <td><span class="stars-sm">★★★★★</span></td>
+                        <td>24</td>
+                        <td>2025.04.23</td>
+                        <td><button class="btn btn-danger btn-sm">삭제</button></td>
+                    </tr>
+                    <tr>
+                        <td>4</td>
+                        <td><a href="02_detail.html" style="color:#4a90d9; text-decoration:none;">강남역 직장인 점심 맛집 추천</a></td>
+                        <td>김철수</td>
+                        <td><span class="stars-sm">★★★★☆</span></td>
+                        <td>18</td>
+                        <td>2025.04.22</td>
+                        <td><button class="btn btn-danger btn-sm">삭제</button></td>
+                    </tr>
+                    <tr>
+                        <td>3</td>
+                        <td><a href="02_detail.html" style="color:#4a90d9; text-decoration:none;">홍대 분위기 좋은 파스타 맛집 발견!</a></td>
+                        <td>이영희</td>
+                        <td><span class="stars-sm">★★★★☆</span></td>
+                        <td>12</td>
+                        <td>2025.04.21</td>
+                        <td><button class="btn btn-danger btn-sm">삭제</button></td>
+                    </tr>
+                    <tr>
+                        <td>2</td>
+                        <td><a href="02_detail.html" style="color:#4a90d9; text-decoration:none;">성수동 브런치 카페 솔직 후기</a></td>
+                        <td>박민준</td>
+                        <td><span class="stars-sm">★★★☆☆</span></td>
+                        <td>5</td>
+                        <td>2025.04.20</td>
+                        <td><button class="btn btn-danger btn-sm">삭제</button></td>
+                    </tr>
+                    <tr>
+                        <td>1</td>
+                        <td><a href="02_detail.html" style="color:#4a90d9; text-decoration:none;">마포 돼지갈비 — 가성비 최고 고기집</a></td>
+                        <td>최수진</td>
+                        <td><span class="stars-sm">★★★★★</span></td>
+                        <td>31</td>
+                        <td>2025.04.19</td>
+                        <td><button class="btn btn-danger btn-sm">삭제</button></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- 탭4: 댓글 관리 -->
+    <div class="tab-content" id="tab-comment">
+        <div class="card" style="padding:0; overflow:hidden;">
+            <div style="padding:16px 20px; border-bottom:1px solid #eee;">
+                <strong>최근 댓글</strong>
+            </div>
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>번호</th>
+                        <th>내용</th>
+                        <th>작성자</th>
+                        <th>게시글</th>
+                        <th>작성일</th>
+                        <th>관리</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>1204</td>
+                        <td>여기 진짜 맛있어요! 저도 다녀왔는데 강추합니다 👍</td>
+                        <td>김철수</td>
+                        <td><a href="02_detail.html" style="color:#4a90d9; text-decoration:none;">을지로 노포 곱창집, 진짜 현지 맛이에요</a></td>
+                        <td>2025.04.23</td>
+                        <td><button class="btn btn-danger btn-sm">삭제</button></td>
+                    </tr>
+                    <tr>
+                        <td>1203</td>
+                        <td>주차는 어디에 하면 되나요?</td>
+                        <td>이영희</td>
+                        <td><a href="02_detail.html" style="color:#4a90d9; text-decoration:none;">강남역 직장인 점심 맛집 추천</a></td>
+                        <td>2025.04.22</td>
+                        <td><button class="btn btn-danger btn-sm">삭제</button></td>
+                    </tr>
+                    <tr>
+                        <td>1202</td>
+                        <td>분위기 좋아 보이네요. 데이트 코스로 가봐야겠어요.</td>
+                        <td>박민준</td>
+                        <td><a href="02_detail.html" style="color:#4a90d9; text-decoration:none;">홍대 분위기 좋은 파스타 맛집 발견!</a></td>
+                        <td>2025.04.21</td>
+                        <td><button class="btn btn-danger btn-sm">삭제</button></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+</div>
+
+<footer class="footer">ⓒ 2025 오늘뭐먹지</footer>
+
+<script>
+    // ── 탭 전환 기능 ──────────────────────────────────────────
+    // 탭 버튼을 누르면 해당 내용만 보이고 나머지는 숨긴다.
+    //  - 각 버튼(.tab-btn)에는 data-tab="보여줄 내용의 id" 가 들어 있음
+    //    예) <button class="tab-btn" data-tab="tab-withdraw"> → id="tab-withdraw" 내용을 보여줌
+    //  - 각 내용(.tab-content)에는 그 id 가 붙어 있음
+    //  - "active" 클래스가 붙은 버튼/내용만 활성(파란 버튼 + 내용 표시)으로 보인다 (CSS에서 처리)
+
+    // 1) 화면에 있는 모든 탭 버튼과 탭 내용을 가져온다 (querySelectorAll = 조건에 맞는 요소 전부 선택)
+    const tabButtons  = document.querySelectorAll('.tab-btn');
+    const tabContents = document.querySelectorAll('.tab-content');
+
+    // 2) 버튼마다 클릭 이벤트(클릭했을 때 실행될 동작)를 연결한다
+    tabButtons.forEach(function (button) {
+        button.addEventListener('click', function () {
+
+            // 2-1) 모든 버튼과 모든 내용에서 active 를 떼어낸다 (= 전부 비활성/숨김 상태로 초기화)
+            tabButtons.forEach(function (b) { b.classList.remove('active'); });
+            tabContents.forEach(function (c) { c.classList.remove('active'); });
+
+            // 2-2) 방금 누른 버튼에 active 를 붙인다 (파란색으로 표시)
+            button.classList.add('active');
+
+            // 2-3) 버튼의 data-tab 값(보여줄 내용의 id)을 읽어, 같은 id 를 가진 내용에 active 를 붙인다
+            const targetId = button.dataset.tab;            // 예: "tab-withdraw"
+            document.getElementById(targetId).classList.add('active'); // 그 내용만 화면에 표시
+        });
+    });
+</script>
+
+</body>
+</html>

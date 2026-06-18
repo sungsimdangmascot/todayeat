@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+
+<body>
+   <!-- 공통 헤더 -->
+   <header class="header" th:fragment="header">
+      <a class="logo" th:href="@{/}">🍽 오늘뭐먹지</a>
+      <nav class="nav">
+         <a href="08_map.html">📍 지도</a>
+         
+         <!-- 비로그인 상태일 때 -->
+         <th:block th:if="${session.loginMember == null}">
+            <a th:href="@{/member/login-form}">로그인</a>
+            <a th:href="@{/member/join-form}" class="btn-nav">회원가입</a>
+         </th:block>
+
+         <!-- 로그인 상태일 때 -->
+         <th:block th:unless="${session.loginMember == null}">
+            <span class="user-name" 
+               th:text="|안녕하세요, ${session.loginMember.memberName}님|">
+               안녕하세요, 홍길동님
+            </span>
+            <a th:href="@{/post/write}" class="btn-nav">✏️ 글쓰기</a>
+            <a href="07_mypage.html">마이페이지</a>
+            <a th:href="@{/member/logout}">로그아웃</a>
+         </th:block>
+      </nav>
+   </header>
+   
+   
+   <!-- 공통 푸터 -->
+   <footer class="footer" th:fragment="footer">ⓒ 2025 오늘뭐먹지</footer>
+
+</body>
+
+</html>
+
+
+
+
+

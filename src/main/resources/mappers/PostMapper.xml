@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.todayeat.mapper.PostMapper">
+   <!-- place_id와  post_img는 나중에 추가-->
+   <insert id="write">
+      INSERT INTO POST(MEMBER_ID, POST_TITLE, POST_CONTENT, POST_RATING)
+      VALUES(#{memberId}, #{postTitle}, #{postContent}, #{postRating})
+   </insert>
+   
+   <select id="findAll" resultType="com.todayeat.dto.PostDTO">
+      SELECT 
+         p.POST_ID,
+         p.POST_TITLE,
+         p.POST_RATING,
+         p.POST_CREATED_AT,
+         m.MEMBER_NAME
+      FROM POST p JOIN MEMBER m
+         ON p.member_id = m.member_id 
+      ORDER BY p.POST_ID DESC
+   </select>
+   
+   <!--상세 조회-->
+   <select id="findById" parameterType="int" resultType="com.todayeat.dto.PostDTO">
+      <!-- JOIN  : 
+         LEFT JOIN PLACE - 장소 정보가 없을 수도 있으므로(place_id = null)
+               LEFT JOIN 사용
+               LEFT JOIN은 오른쪽 테이블에 해당 값이 없어도 
+               NULL 로 채우면서 나머지 결과를 반환함
+               일반 JOIN을 쓰면 PLACE_ID가 NULL인 게시글이 조회결과에서 빠짐
+      -->
+      SELECT
+         p.POST_ID, 
+         p.MEMBER_ID,
+         p.POST_TITLE,
+         p.POST_CONTENT,
+         p.POST_IMG,
+         p.POST_RATING,
+         p.POST_CREATED_AT,
+         p.POST_UPDATED_AT,
+         m.MEMBER_NAME,
+         pl.PLACE_NAME,
+         pl.PLACE_ADDRESS,
+         pl.PLACE_LAT,
+         pl.PLACE_LNG
+      FROM POST p 
+         JOIN MEMBER m ON p.MEMBER_ID = m.MEMBER_ID
+         LEFT JOIN PLACE pl on p.PLACE_ID = pl.PLACE_ID
+      WHERE p.POST_ID = #{postId}
+   </select>
+   
+   <!-- 후기글 수정 -->
+   <update id="update" parameterType="com.todayeat.dto.PostDTO">
+      UPDATE POST 
+      SET POST_TITLE = #{postTitle},
+          POST_CONTENT = #{postContent},
+          POST_RATING = #{postRating},
+          POST_UPDATED_AT = NOW()
+      WHERE POST_ID = #{postId}
+   </update>
+   
+
+
+</mapper>    
+
+
+
+
+
+
+
+
+

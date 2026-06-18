@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+   <meta charset="UTF-8">
+   <title>오늘뭐먹지 - 게시글 수정</title>
+   <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+
+<body>
+
+   <header th:replace="~{fragments/layout :: header}">
+   </header>
+
+   <div class="container" style="max-width: 760px;">
+      <div class="page-title">✏️ 맛집 후기 수정</div>
+
+      <form th:action="@{/post/update/{id}(id=${post.postId})}" class="card" method="post">
+
+         <div class="form-group">
+            <label>제목 *</label>
+            <input name="postTitle" class="form-control" type="text" th:value="${post.postTitle}">
+         </div>
+
+         <div class="form-group">
+            <label>별점 *</label>
+            <div class="rating-input">
+               <span class="active">★</span>
+               <span class="active">★</span>
+               <span class="active">★</span>
+               <span class="active">★</span>
+               <span class="active">★</span>
+            </div>
+            <input type="hidden" name="postRating" th:value="${post.postRating}">
+            <div class="text-muted text-sm mt-8">별을 클릭해서 별점을 변경하세요</div>
+         </div>
+
+         <div class="form-group">
+            <label>📍 맛집 위치 *</label>
+            <div class="flex gap-8 mb-8">
+               <input class="form-control" type="text" value="서울 중구 을지로3가" style="flex:1;">
+               <button class="btn btn-outline">위치 변경</button>
+            </div>
+            <!-- 기존 위치가 지도에 표시된 상태 -->
+            <div class="map-placeholder" style="height: 200px; background: #dde8dd;">
+               <span class="map-icon">📍</span>
+               <span>서울 중구 을지로3가 (기존 위치)</span>
+               <span style="font-size:0.8rem; color:#6a9a6a;">(카카오맵 API)</span>
+            </div>
+         </div>
+
+         <div class="form-group">
+            <label>사진</label>
+            <!-- 기존에 저장돼 있던 사진 (새 사진을 고르면 아래 미리보기로 가려짐) -->
+            <div id="currentImg" class="img-placeholder"
+               style="height:140px; margin-bottom:10px; background:#d8d8d8;">
+               기존 사진 미리보기
+            </div>
+            <!-- 새로 선택한 사진 미리보기 — 파일을 고르기 전에는 숨겨둔다 -->
+            <img id="imgPreview" alt="새 사진 미리보기"
+               style="display:none; max-width:100%; max-height:200px; object-fit:cover; border-radius:8px; margin-bottom:10px;">
+            <input type="file" id="imgInput" accept="image/*" style="font-size:0.85rem;">
+            <div class="text-muted text-sm mt-8">새 파일을 선택하면 기존 사진이 교체됩니다</div>
+         </div>
+
+         <div class="form-group">
+            <label>후기 내용 *</label>
+            <textarea class="form-control" rows="6" name="postContent"
+               th:text="${post.postContent}">
+               
+            </textarea>
+         </div>
+
+         <div class="flex-between" style="margin-top:8px;">
+            <a th:href="@{/post/{id}(id=${post.postId})}">
+               <button class="btn btn-secondary">취소</button>
+            </a>
+            <button type="submit" class="btn btn-primary" style="padding: 10px 32px;">수정 완료</button>
+         </div>
+
+      </form>
+   </div>
+
+   <footer th:replace="~{fragments/layout :: footer}"></footer>
+
+
+   <script>
+      // ===== 별점 클릭 처리 ===============
+      let stars = document.querySelectorAll(".rating-input span");
+      let ratingInput = document.querySelector("input[name='postRating']");
+
+      // console.log(stars);
+      // console.log(ratingInput);
+
+      // 별 표시 업데이트 - rating 개수만큼 active(노란색), 나머지는 비활성화
+      function updateStars(rating) {
+         stars.forEach(function (s, i) {
+            if (i < rating) {
+               s.classList.add("active");
+            } else {
+               s.classList.remove("active");
+            }
+         });
+      }
+
+      stars.forEach(function (star, index) {
+         // 클릭 이벤트 - 별점 확정 + hidden필드 값 변경
+         star.addEventListener("click", function () {
+            ratingInput.value = index + 1;
+            updateStars(index + 1);
+            console.log(ratingInput);
+         });
+
+         // 마우스 올릴때 - 미리보기(해당 별까지 노란색으로 표시)
+         star.addEventListener("mouseover", function () {
+            updateStars(index + 1);
+         });
+
+         // 마우스 나갈때 - 현재 확정된 별점으로 유지
+         star.addEventListener("mouseout", function () {
+            updateStars(parseInt(ratingInput.value));
+         });
+      });
+
+
+      // ===== 사진 업로드 미리보기 =====   
+      // [1] 파일 선택칸 · 새 사진 미리보기 · 기존 사진 박스를 가져온다
+      const imgInput = document.getElementById('imgInput');     // <input type="file">
+      const imgPreview = document.getElementById('imgPreview');   // 새로 고른 사진 미리보기
+      const currentImg = document.getElementById('currentImg');   // 기존에 저장된 사진 박스
+
+      // [2] 새 파일을 선택하면 그 사진을 보여주고, 기존 사진 박스는 숨긴다
+      imgInput.addEventListener('change', function () {
+         const file = imgInput.files[0];
+         if (!file) return;
+
+         const reader = new FileReader();              // 파일을 화면에 쓸 수 있는 형태로 읽는 도구
+         reader.onload = function (e) {
+            imgPreview.src = e.target.result;
+            imgPreview.style.display = 'block';       // 새 사진 미리보기 표시
+            currentImg.style.display = 'none';        // 기존 사진 박스는 숨김
+         };
+         reader.readAsDataURL(file);
+      });
+   </script>
+
+</body>
+
+</html>

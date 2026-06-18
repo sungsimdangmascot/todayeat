@@ -1,0 +1,13 @@
+package com.todayeat;
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+
+@SpringBootApplication
+public class TodayeatApplication {
+
+	public static void main(String[] args) {
+		SpringApplication.run(TodayeatApplication.class, args);
+	}
+
+}

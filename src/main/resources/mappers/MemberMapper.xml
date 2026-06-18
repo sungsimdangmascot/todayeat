@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+    
+<mapper namespace="com.todayeat.mapper.MemberMapper">
+
+   <!-- 회원 가입 -->
+   <insert id="join" parameterType="com.todayeat.dto.MemberDTO">
+      INSERT INTO MEMBER(MEMBER_LOGINID, MEMBER_PWD, MEMBER_NAME, 
+         MEMBER_EMAIL) 
+      VALUES(#{memberLoginId}, #{memberPwd}, #{memberName}, #{memberEmail})
+   </insert>
+   
+   <!-- 아이디 중복 확인 -->
+   <select id="findByLoginId" parameterType="String" resultType="com.todayeat.dto.MemberDTO">
+      SELECT * FROM MEMBER WHERE MEMBER_LOGINID = #{memberLoginId}
+   </select>
+   
+   
+</mapper>
+
+
+
+
+
+
+
+

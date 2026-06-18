@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>오늘뭐먹지 - 메인</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+
+<header th:replace ="~{fragments/layout :: header}">  
+</header>
+
+<div class="container">
+
+    <!-- 검색 -->
+    <div class="search-bar">
+        <input class="form-control" type="text" placeholder="맛집 이름이나 지역으로 검색하세요">
+        <button class="btn btn-primary">검색</button>
+        <a href="08_map.html"><button class="btn btn-outline">📍 내 주변 맛집</button></a>
+    </div>
+
+   <!-- 게시글이 한건도 없을때 표시할 내용 -->
+   <div th:if="${#lists.isEmpty(postList)}"
+      style="text-align:center; padding:80px 0; color:#aaa; font-size:1.1rem;">
+      아직 등록된 게시글이 없습니다. 첫번째 후기를 작성해주세요!
+   </div>
+    <!-- 게시글 목록 -->
+    <a class="post-card" 
+      th:each="post : ${postList}"
+      th:href="@{/post/{id}(id=${post.postId})}">
+        <div class="img-placeholder post-thumb">사진</div>
+        <div class="post-info">
+            <div class="post-title" th:text="${post.postTitle}">제목</div>
+            <div class="post-meta">📍 위치 정보</div>
+            <div class="post-footer">
+            <!-- 별점 숫자로 표시 -->
+            <!--|| 안에서 문자열과 변수를 섞어서 사용 가능 -->
+                <span class="stars-sm" th:text="|★ ${post.postRating}|">★★★★★</span>
+                <div class="post-stats">
+                    <span th:text="${post.memberName}">작성자</span>
+                    <span th:text="${post.postCreatedAt}">날짜</span>
+                    <span>♥ 24</span>
+                    <span>💬 7</span>
+                </div>
+            </div>
+        </div>
+    </a>
+
+    <!-- 페이지네이션 -->
+    <div class="pagination">
+        <a class="page-btn" href="#">◀</a>
+        <a class="page-btn active" href="#">1</a>
+        <a class="page-btn" href="#">2</a>
+        <a class="page-btn" href="#">3</a>
+        <a class="page-btn" href="#">4</a>
+        <a class="page-btn" href="#">5</a>
+        <a class="page-btn" href="#">▶</a>
+    </div>
+
+</div>
+
+<footer th:replace="~{fragments/layout :: footer}"></footer>
+
+</body>
+</html>
+
+
+
+
