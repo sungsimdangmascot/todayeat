@@ -1,133 +1,190 @@
 <!DOCTYPE html>
 <html lang="ko" xmlns:th="http://www.thymeleaf.org">
+
 <head>
-    <meta charset="UTF-8">
-    <title>오늘뭐먹지 - 마이페이지</title>
-    <link rel="stylesheet" th:href="@{/css/style/}">
+	<meta charset="UTF-8">
+	<title>오늘뭐먹지 - 마이페이지</title>
+	<link rel="stylesheet" th:href="@{/css/style.css}">
 </head>
+
 <body>
 
-	<header th:replace ="~{fragments/layout :: header}">  
+	<header th:replace="~{fragments/layout :: header}">
 	</header>
 
-<div class="container" style="max-width:680px;">
-    <div class="page-title">마이페이지</div>
+	<div class="container" style="max-width:680px;">
+		<div class="page-title">마이페이지</div>
 
-    <!-- 프로필 요약 -->
-    <form class="card" th:action="">
-        <div style="display:flex; align-items:center; gap:20px;">
-            <div class="profile-img">사진</div>
-            <div>
-                <div style="font-size:1.2rem; font-weight:bold;">홍길동</div>
-                <div class="text-muted text-sm mt-8">hong123</div>
-                <div class="text-muted text-sm">hong@email.com</div>
-                <div class="mt-8">
-                    <span class="badge badge-primary">일반 회원</span>
-                </div>
-            </div>
-        </div>
-    </form>
+		<!-- 프로필 요약 -->
+		<div class="card">
+			<div style="display:flex; align-items:center; gap:20px;">
+				<!-- 프로필 사진이 있을 때 -->
+				<img th:if="${member.memberProfileImg != null}"
+					th:src="@{/upload/{img}(img=${member.memberProfileImg})}"
+					class="profile-img"
+					style="object-fit: cover;"
+					alt="프로필 사진">
+				<!-- 프로필 사진이 없을 때 -->
+				<div th:unless="${member.memberProfileImg != null}" class="profile-img">사진</div>
+				<div>
+					<div style="font-size:1.2rem; font-weight:bold;"
+						th:text="${member.memberName}">홍길동</div>
+					<div class="text-muted text-sm mt-8"
+						th:text="${member.memberLoginId}">hong123</div>
+					<div class="text-muted text-sm"
+						th:text="${member.memberEmail}">hong@email.com</div>
+					<div class="mt-8">
+						<span class="badge badge-primary">일반 회원</span>
+					</div>
+				</div>
+			</div>
+		</div>
 
-    <!-- 정보 수정 -->
-    <div class="card">
-        <h3 style="margin-bottom:20px;">회원 정보 수정</h3>
+		<!-- 정보 수정 -->
+		<div class="card">
+			<h3 style="margin-bottom:20px;">회원 정보 수정</h3>
+			<form th:action="@{/member/update}" method="post" enctype="multipart/form-data">
+			<div class="form-group">
+				<label>아이디</label>
+				<input class="form-control" type="text" th:value="${member.memberLoginId}" readonly
+					style="background:#f8f9fa; color:#888;">
+				<div class="text-muted text-sm mt-8">아이디는 변경할 수 없습니다</div>
+			</div>
 
-        <div class="form-group">
-            <label>아이디</label>
-            <input class="form-control" type="text" value="hong123" readonly
-                   style="background:#f8f9fa; color:#888;">
-            <div class="text-muted text-sm mt-8">아이디는 변경할 수 없습니다</div>
-        </div>
+			<div class="form-group">
+				<label>이름</label>
+				<input class="form-control" type="text" name="memberName" th:value="${member.memberName}">
+			</div>
 
-        <div class="form-group">
-            <label>이름</label>
-            <input class="form-control" type="text" value="홍길동">
-        </div>
+			<div class="form-group">
+				<label>프로필 사진</label>
+				<div style="display:flex; align-items:center; gap:16px; margin-bottom:10px;">
+					<!-- 현재 프로필 사진 (새 사진을 고르면 아래 미리보기로 가려짐) -->
+					<!-- 현재 프로필 사진이 있을 때-->
+					<img th:if="${member.memberProfileImg != null}"
+						 th:src="@{/upload/{img}(img=${member.memberProfileImg})}"
+						 class="profile-img"
+						 style="object-fit: cover;"
+						 alt="현재 프로필 사진">
+					
+					<!-- 현재 프로필 사진이 업을때 -->
+					<div th:unless="${member.memberProfileImg != null}"  
+					 id="currentProfile" class="profile-img">현재<br>사진</div>
+					<!-- 새로 선택한 사진 미리보기 — 같은 80×80 원형, 선택 전에는 숨김 -->
+					<img id="profilePreview" alt="미리보기"
+						style="display:none; width:80px; height:80px; border-radius:50%; object-fit:cover;">
+					<div>
+						<input type="file" name="memberProfileImgFile" id="profileInput" accept="image/*" style="font-size:0.85rem;">
+						<div class="text-muted text-sm mt-8">JPG, PNG · 최대 5MB</div>
+					</div>
+				</div>
+			</div>
 
-        <div class="form-group">
-            <label>프로필 사진</label>
-            <div style="display:flex; align-items:center; gap:16px; margin-bottom:10px;">
-                <!-- 현재 프로필 사진 (새 사진을 고르면 아래 미리보기로 가려짐) -->
-                <div id="currentProfile" class="profile-img">현재<br>사진</div>
-                <!-- 새로 선택한 사진 미리보기 — 같은 80×80 원형, 선택 전에는 숨김 -->
-                <img id="profilePreview" alt="미리보기"
-                     style="display:none; width:80px; height:80px; border-radius:50%; object-fit:cover;">
-                <div>
-                    <input type="file" id="profileInput" accept="image/*" style="font-size:0.85rem;">
-                    <div class="text-muted text-sm mt-8">JPG, PNG · 최대 5MB</div>
-                </div>
-            </div>
-        </div>
+			<div class="form-group">
+				<label>현재 비밀번호</label>
+				<input class="form-control" type="password"
+				name="currentPwd" placeholder="변경 시 현재 비밀번호 입력">
+			</div>
 
-        <div class="form-group">
-            <label>현재 비밀번호</label>
-            <input class="form-control" type="password" placeholder="변경 시 현재 비밀번호 입력">
-        </div>
+			<div class="form-group">
+				<label>새 비밀번호</label>
+				<input class="form-control" type="password" 
+				name = "memberPwd"
+				placeholder="새 비밀번호 (변경하지 않으면 비워두세요)">
+			</div>
+			<!-- 오류 메시지 - 현재 비밀번호 불일치시 표시 -->
+			<div th:if="${errorMsg != null}"
+				th:text="${errorMsg}"
+				style="color:#e74c3c; font-size:0.85rem; margin-top:8px; margin-bottom:8px;">
+			</div>
+			
+			<!-- 성공 메시지 - 수정 완료 시 표시 -->
+			<div th:if="${successMsg != null}"
+				th:text="${successMsg}"
+				style="color:#27ae60; font-size:0.85rem; margin-top:8px; margin-bottom:8px;">
+			</div>
 
-        <div class="form-group">
-            <label>새 비밀번호</label>
-            <input class="form-control" type="password" placeholder="새 비밀번호 (변경하지 않으면 비워두세요)">
-        </div>
+			<button type="submit" class="btn btn-primary" style="padding:10px 28px;">수정 완료</button>
+			</form>
+		</div>
 
-        <button class="btn btn-primary" style="padding:10px 28px;">수정 완료</button>
-    </div>
+		<!-- 내가 쓴 글 -->
+		<div class="card">
+			<h3 style="margin-bottom:16px;">
+				내가 쓴 후기 <span style="color:#4a90d9;" th:text="${#lists.size(postList)}">0</span>
+			</h3>
+			<!-- 게시글이 하나도 없을 때 메시지 -->
+			<div th:if="${#lists.isEmpty(postList)}"
+				style="text-align: center; padding: 30px 0; color: #aaa; font-size: 0.9rem;">
+				아직 작성한 후기가 없습니다.
+			</div>
+			<a class="post-card" 
+			   th:each="post : ${postList}"
+			   th:href="@{/post/{id}(id=${post.postId})}" 
+			   style="margin-bottom:8px;">
+			   <!-- 사진이 있을 때 -->
+			   <img th:if="${post.postImg != null}"
+			   	    th:src="@{/upload/{img}(img=${post.postImg})}"
+					class="post-thumb"
+					style="object-fit: cover;"
+					alt="게시글 사진">
+				<!-- 사진이 없을 때 -->
+				<div th:unless="${post.postImg != null}" class="img-placeholder post-thumb">사진</div>
+				<div class="post-info">
+					<div class="post-title" th:text="${post.postTitle}">제목</div>
+					<div class="post-meta" 
+						th:text="|${post.postCreatedAt} &nbsp;·&nbsp; ♥ ${post.likeCount} &nbsp;·&nbsp; 💬 ${post.commentCount}|">
+						날짜 &nbsp;·&nbsp; ♥ 0 &nbsp;·&nbsp; 💬 0
+					</div>
+				</div>
+			</a>
+			
+			<div class="text-center mt-16">
+				<a th:href="@{/}" style="color:#4a90d9; text-decoration:none; font-size:0.88rem;">전체 보기 →</a>
+			</div>
+		</div>
 
-    <!-- 내가 쓴 글 -->
-    <div class="card">
-        <h3 style="margin-bottom:16px;">내가 쓴 후기 <span style="color:#4a90d9;">12</span></h3>
-        <a class="post-card" href="02_detail.html" style="margin-bottom:8px;">
-            <div class="img-placeholder post-thumb">사진</div>
-            <div class="post-info">
-                <div class="post-title">을지로 노포 곱창집, 진짜 현지 맛이에요</div>
-                <div class="post-meta">2025.04.23 &nbsp;·&nbsp; ♥ 24 &nbsp;·&nbsp; 💬 7</div>
-            </div>
-        </a>
-        <a class="post-card" href="02_detail.html">
-            <div class="img-placeholder post-thumb">사진</div>
-            <div class="post-info">
-                <div class="post-title">마포 돼지갈비 솔직 후기</div>
-                <div class="post-meta">2025.04.18 &nbsp;·&nbsp; ♥ 8 &nbsp;·&nbsp; 💬 2</div>
-            </div>
-        </a>
-        <div class="text-center mt-16">
-            <a href="01_main.html" style="color:#4a90d9; text-decoration:none; font-size:0.88rem;">전체 보기 →</a>
-        </div>
-    </div>
+		<!-- 회원 탈퇴 -->
+		<div class="card" style="border: 1px solid #fde8e8;">
+			<h3 style="color:#e74c3c; margin-bottom:8px;">회원 탈퇴</h3>
+			<p class="text-muted text-sm" style="margin-bottom:16px;">
+				탈퇴 시 작성하신 모든 게시글과 댓글이 삭제되며 복구할 수 없습니다.
+			</p>
+			<form th:action="@{/member/delete}" method="post"
+				onsubmit="return confirm('정말로 탈퇴하시겠습니까? 이 작업은 되돌릴수 없습니다.')">
+				<button type="submit" class="btn btn-danger btn-sm">탈퇴하기</button>
+			</form>
+		</div>
 
-    <!-- 회원 탈퇴 -->
-    <div class="card" style="border: 1px solid #fde8e8;">
-        <h3 style="color:#e74c3c; margin-bottom:8px;">회원 탈퇴</h3>
-        <p class="text-muted text-sm" style="margin-bottom:16px;">
-            탈퇴 시 작성하신 모든 게시글과 댓글이 삭제되며 복구할 수 없습니다.
-        </p>
-        <button class="btn btn-danger btn-sm">탈퇴하기</button>
-    </div>
+	</div>
 
-</div>
+	<footer th:replace="~{fragments/layout :: footer}"></footer>
 
-<footer th:replace="~{fragments/layout :: footer}"></footer>
+	<!-- ===== 프로필 사진 미리보기 ===== -->
+	<script>
+		// [1] 파일 선택칸 · 새 사진 미리보기 · 현재 사진 박스를 가져온다
+		const profileInput = document.getElementById('profileInput');    // <input type="file">
+		const profilePreview = document.getElementById('profilePreview');  // 새로 고른 사진 미리보기
+		const currentProfile = document.getElementById('currentProfile');  // 현재 프로필 사진 박스
 
-<!-- ===== 프로필 사진 미리보기 ===== -->
-<script>
-    // [1] 파일 선택칸 · 새 사진 미리보기 · 현재 사진 박스를 가져온다
-    const profileInput   = document.getElementById('profileInput');    // <input type="file">
-    const profilePreview = document.getElementById('profilePreview');  // 새로 고른 사진 미리보기
-    const currentProfile = document.getElementById('currentProfile');  // 현재 프로필 사진 박스
-
-    // [2] 새 파일을 선택하면 그 사진을 보여주고, 현재 사진 박스는 숨긴다
-    profileInput.addEventListener('change', function () {
-        const file = profileInput.files[0];
-        if (!file) return;
-
-        const reader = new FileReader();              // 파일을 화면에 쓸 수 있는 형태로 읽는 도구
-        reader.onload = function (e) {
-            profilePreview.src = e.target.result;
-            profilePreview.style.display = 'block';   // 새 사진 미리보기 표시
-            currentProfile.style.display = 'none';    // 현재 사진 박스는 숨김
-        };
-        reader.readAsDataURL(file);
-    });
-</script>
+		// [2] 새 파일을 선택하면 그 사진을 보여주고, 현재 사진 박스는 숨긴다
+		profileInput.addEventListener('change', function () {
+			const file = profileInput.files[0];
+			if (!file) return;
+			// FileReader() - 파일 내용을 브라우저가 화면에 표시할 수 있는 
+			// 			형태로 읽는 도구
+			const reader = new FileReader();              // 파일을 화면에 쓸 수 있는 형태로 읽는 도구
+			// 파일 읽기가 끝나면(onload) 그 결과를 미리보기에 넣는다
+			reader.onload = function (e) {
+				profilePreview.src = e.target.result;
+				profilePreview.style.display = 'block';   // 새 사진 미리보기 표시
+				currentProfile.style.display = 'none';    // 현재 사진 박스는 숨김
+			};
+			// 실제 읽기 시작 : 이미지를 data URL 형태로 변환
+			reader.readAsDataURL(file);
+		});
+	</script>
 
 </body>
+
 </html>

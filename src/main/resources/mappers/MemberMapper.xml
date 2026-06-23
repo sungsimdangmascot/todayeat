@@ -5,19 +5,55 @@
     
 <mapper namespace="com.todayeat.mapper.MemberMapper">
 
-   <!-- 회원 가입 -->
-   <insert id="join" parameterType="com.todayeat.dto.MemberDTO">
-      INSERT INTO MEMBER(MEMBER_LOGINID, MEMBER_PWD, MEMBER_NAME, 
-         MEMBER_EMAIL) 
-      VALUES(#{memberLoginId}, #{memberPwd}, #{memberName}, #{memberEmail})
-   </insert>
-   
-   <!-- 아이디 중복 확인 -->
-   <select id="findByLoginId" parameterType="String" resultType="com.todayeat.dto.MemberDTO">
-      SELECT * FROM MEMBER WHERE MEMBER_LOGINID = #{memberLoginId}
-   </select>
-   
-   
+	<!-- 회원 가입 -->
+	<insert id="join" parameterType="com.todayeat.dto.MemberDTO">
+		INSERT INTO MEMBER(MEMBER_LOGINID, MEMBER_PWD, MEMBER_NAME, 
+			MEMBER_EMAIL) 
+		VALUES(#{memberLoginId}, #{memberPwd}, #{memberName}, #{memberEmail})
+	</insert>
+	
+	<!-- 아이디 중복 확인 -->
+	<select id="findByLoginId" parameterType="String" resultType="com.todayeat.dto.MemberDTO">
+		SELECT * FROM MEMBER WHERE MEMBER_LOGINID = #{memberLoginId}
+	</select>
+	
+	<!-- 회원 1명의 정보 조회 -->
+	<select id="findById" parameterType="int"
+		resultType="com.todayeat.dto.MemberDTO">
+		SELECT *
+		FROM MEMBER
+		WHERE MEMBER_ID = #{memberId}
+	</select>
+	
+	<!-- 회원 이름만 수정 -->
+	<update id="updateInfo" parameterType="com.todayeat.dto.MemberDTO">
+		UPDATE MEMBER
+			SET MEMBER_NAME = #{memberName}
+		WHERE MEMBER_ID = #{memberId}
+	</update>
+	
+	<!-- 비밀번호만  수정 -->
+	<update id="updatePwd" parameterType="com.todayeat.dto.MemberDTO">
+		UPDATE MEMBER
+			SET MEMBER_PWD = #{memberPwd}
+		WHERE MEMBER_ID = #{memberId}
+	</update>
+	
+	<!-- 회원 탈퇴 신청 -->
+	<update id="withdraw" parameterType="int">
+		UPDATE MEMBER
+			SET MEMBER_STATUS = 'WITHDRAW'
+		WHERE MEMBER_ID = #{memberId}
+	</update>
+	
+	<!-- 마이페이지 프로필 사진 수정 -->
+	<update id="updateProfileImg" parameterType="com.todayeat.dto.MemberDTO">
+		UPDATE MEMBER
+			SET MEMBER_PROFILE_IMG = #{memberProfileImg}
+		WHERE MEMBER_ID = #{memberId}
+	</update>
+	
+	
 </mapper>
 
 

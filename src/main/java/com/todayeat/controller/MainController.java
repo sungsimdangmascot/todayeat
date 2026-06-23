@@ -14,21 +14,21 @@ import lombok.RequiredArgsConstructor;
 @Controller
 @RequiredArgsConstructor
 public class MainController {
-   
-   private final PostService postService;
-   
-   @GetMapping("/")
-   public String main(Model model) {
-      
-//      DB에서 전체 게시글 목록 조회
-      List<PostDTO> postList = postService.findAll();
-      
-//      main.html에서 ${postList}로 꺼내서 사용
-      model.addAttribute("postList", postList);
-      
-      return "main";
-   }
-   
+	
+	private final PostService postService;
+	
+	@GetMapping("/")
+	public String main(Model model) {
+		
+//		DB에서 전체 게시글 목록 조회
+		List<PostDTO> postList = postService.findAll();
+		
+//		main.html에서 ${postList}로 꺼내서 사용
+		model.addAttribute("postList", postList);
+		
+		return "main";
+	}
+	
 
 }
 

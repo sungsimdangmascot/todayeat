@@ -28,7 +28,16 @@
     <a class="post-card" 
       th:each="post : ${postList}"
       th:href="@{/post/{id}(id=${post.postId})}">
-        <div class="img-placeholder post-thumb">사진</div>
+	  
+	  <!-- 사진이 있을때 -->
+	        <img th:if="${post.postImg != null}"
+	            th:src="@{/upload/{img}(img=${post.postImg})}"
+	            class="post-thumb"
+	            style="object-fit:cover;"
+	            alt="게시글 사진">
+	        <!-- 사진이 없을 때 -->
+	          <div th:unless="${post.postImg != null}" class="img-placeholder post-thumb">사진</div>
+			  
         <div class="post-info">
             <div class="post-title" th:text="${post.postTitle}">제목</div>
             <div class="post-meta">📍 위치 정보</div>
@@ -39,8 +48,9 @@
                 <div class="post-stats">
                     <span th:text="${post.memberName}">작성자</span>
                     <span th:text="${post.postCreatedAt}">날짜</span>
-                    <span>♥ 24</span>
+                    <span th:text="|♥ ${post.likeCount}|">♥ 24</span>
                     <span>💬 7</span>
+					<span th:text="|💬 ${post.commentCount}|">💬 0</span>
                 </div>
             </div>
         </div>

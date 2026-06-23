@@ -14,8 +14,9 @@
 
    <div class="container" style="max-width: 760px;">
       <div class="page-title">✏️ 맛집 후기 작성</div>
-
-      <form class="card" th:action="@{/post/write}" method="post">
+      
+      <!-- enctype="multipart/form-data" 사진 파일을 전송하기 위해 작성 -->
+      <form class="card" th:action="@{/post/write}" method="post" enctype="multipart/form-data">
 
          <div class="form-group">
             <label>제목 *</label>
@@ -52,7 +53,7 @@
          <div class="form-group">
             <label>사진 업로드</label>
             <!-- 파일 선택 버튼을 눌러 사진을 올린다 (브라우저 기본 업로드 버튼) -->
-            <input type="file" id="imgInput" accept="image/*" style="font-size:0.85rem;">
+            <input type="file" name="imgFile" id="imgInput" accept="image/*" style="font-size:0.85rem;">
             <div class="text-muted text-sm mt-8">JPG, PNG 파일 · 최대 10MB</div>
             <!-- 선택한 사진 미리보기 — 파일을 고르기 전에는 숨겨둔다 -->
             <img id="imgPreview" alt="미리보기"
