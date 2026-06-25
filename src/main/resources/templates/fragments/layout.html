@@ -6,7 +6,7 @@
    <header class="header" th:fragment="header">
       <a class="logo" th:href="@{/}">🍽 오늘뭐먹지</a>
       <nav class="nav">
-         <a href="08_map.html">📍 지도</a>
+         <a th:href="@{/map}">📍 지도</a>
          
          <!-- 비로그인 상태일 때 -->
          <th:block th:if="${session.loginMember == null}">

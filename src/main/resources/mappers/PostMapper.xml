@@ -6,10 +6,22 @@
 <mapper namespace="com.todayeat.mapper.PostMapper">
 	<!-- place_id와  post_img는 나중에 추가-->
 	<insert id="write">
-		INSERT INTO POST(MEMBER_ID, POST_TITLE, POST_CONTENT, POST_RATING, POST_IMG)
-		VALUES(#{memberId}, #{postTitle}, #{postContent}, #{postRating}, #{postImg})
+		INSERT INTO POST(MEMBER_ID, PlACE_ID, POST_TITLE, POST_CONTENT, POST_RATING, POST_IMG)
+		VALUES(#{memberId}, #{placeId}, #{postTitle}, #{postContent}, #{postRating}, #{postImg})
 	</insert>
 	
+	<!-- <if>~</if> 
+		keyword 값이 null도 아니고 빈 문자열도 아닐 때만 WHERE 조건을 붙임
+		-> 검색어가 없으면 where절 자체가 실행되지 않음
+		
+		CONCAT('%', #{keyword}, '%')
+		- '%강남%' 처럼 앞뒤에 %를 붙여 부분 일치 검색
+		- XML 안에서 '%#{keyword}%'처럼 쓰면 MyBatis가 제대로 파싱하지 
+		  못하므로 CONCAT()으로 문자열 연결함
+	 	
+	 	LIMIT #{size} OFFSET #{offset}
+	 	- 검색 여부와 상관없이 항상 실행 		
+	 -->
 	<select id="findAll" resultType="com.todayeat.dto.PostDTO">
 		SELECT 
 			p.POST_ID,
@@ -18,11 +30,28 @@
 			p.POST_RATING,
 			p.POST_CREATED_AT,
 			m.MEMBER_NAME,
+			pl.PLACE_NAME,
 			(SELECT COUNT(*) FROM POST_LIKE lk WHERE lk.POST_ID = p.POST_ID) AS LIKE_COUNT,
 			(SELECT COUNT(*) FROM COMMENT c WHERE c.POST_ID = p.POST_ID) AS COMMENT_COUNT
-		FROM POST p JOIN MEMBER m
-			ON p.member_id = m.member_id 
+		FROM POST p 
+			JOIN MEMBER m ON p.member_id = m.member_id
+			JOIN PLACE pl on p.PLACE_ID = pl.PLACE_ID
+		<if test="keyword != null and keyword != ''">
+		WHERE p.POST_TITLE LIKE CONCAT('%', #{keyword}, '%')
+			OR p.POST_CONTENT LIKE CONCAT('%', #{keyword}, '%')
+		</if>
 		ORDER BY p.POST_ID DESC
+		LIMIT #{size} OFFSET #{offset}
+	</select>
+	
+	<!-- 전체 게시글 개수 조회 -->
+	<select id="countAll" resultType="int">
+		SELECT COUNT(*)
+		FROM POST p
+		<if test="keyword != null and keyword != ''">
+		WHERE p.POST_TITLE LIKE CONCAT('%', #{keyword}, '%')
+			OR p.POST_CONTENT LIKE CONCAT('%', #{keyword}, '%')
+		</if>
 	</select>
 	
 	<!--상세 조회-->
@@ -66,6 +95,10 @@
 		SET POST_TITLE = #{postTitle},
 		    POST_CONTENT = #{postContent},
 		    POST_RATING = #{postRating},
+		    <!-- 수정할 place_id가 있을때만 변경 -->
+		    <if test="placeId != null and placeId != 0">
+		    	PLACE_ID = #{placeId}, 
+		    </if>
 		    <if test="postImg != null">
 		    	POST_IMG = #{postImg},
 		    </if>
@@ -95,6 +128,22 @@
 		ORDER BY p.POST_ID DESC
 	</select>
 
+<!--
+	 map에 필요한 게시글, 장소 데이터 조회 
+-->
+<select id="findAllForMap" resultType="com.todayeat.dto.PostDTO">
+	SELECT 
+		p.POST_ID,
+		p.POST_TITLE,
+		p.POST_RATING,
+		p.POST_IMG,
+		pl.PLACE_NAME,
+		pl.PLACE_LAT,
+		pl.PLACE_LNG
+	FROM POST p
+		JOIN PLACE pl ON p.PLACE_ID = pl.PLACE_ID
+		ORDER BY p.POST_ID DESC	
+</select>
 
 </mapper>    
 

@@ -21,8 +21,13 @@ public class PostService {
 	}
 	
 //	2) 전체 게시글 목록 조회
-	public List<PostDTO> findAll(){
-		return postMapper.findAll();
+	public List<PostDTO> findAll(String keyword, int offset, int size){
+		return postMapper.findAll(keyword, offset, size);
+	}
+	
+//	+) 검색 결과 전체 개수 조회
+	public int countAll(String keyword) {
+		return postMapper.countAll(keyword);
 	}
 	
 //	3) 게시글 상세 조회
@@ -45,6 +50,10 @@ public class PostService {
 		return postMapper.findByMemberId(memberId);
 	}
 	
+//	7) map 지도용 - 모든 게시글 좌표 목록 반환(페이징 없음)
+	public List<PostDTO> findAllForMap(){
+		return postMapper.findAllForMap();
+	}
 
 }
 

@@ -38,15 +38,41 @@
 			<div class="form-group">
 				<label>📍 맛집 위치 *</label>
 				<div class="flex gap-8 mb-8">
-					<input class="form-control" type="text" value="서울 중구 을지로3가" style="flex:1;">
-					<button class="btn btn-outline">위치 변경</button>
+					<!-- 기존 주소가 채워져 있는 상태 
+						 다른 장소를 검색하면 위치 변경
+					-->
+					<input class="form-control" type="text" th:value="${post.placeAddress}" id="placeSearchInput" style="flex:1;">
+					<button class="btn btn-outline"
+					type="button" id="placeSearchBtn">
+					위치 변경
+				</button>
 				</div>
-				<!-- 기존 위치가 지도에 표시된 상태 -->
-				<div class="map-placeholder" style="height: 200px; background: #dde8dd;">
-					<span class="map-icon">📍</span>
-					<span>서울 중구 을지로3가 (기존 위치)</span>
-					<span style="font-size:0.8rem; color:#6a9a6a;">(카카오맵 API)</span>
-				</div>
+				<!-- 검색 결과 목록 -->
+				<div id="placeSearchResult"
+				               style="border:1px solid #ddd; border-radius:6px; max-height:180px;
+				                      overflow-y:auto; margin-bottom:8px; display:none;">
+				            </div>
+				            
+				            <!-- 카카오맵 API가 선택한 장소 정보를 아래 hidden 필드에 채움(기존 값으로 미리 채움) -->
+				            <input type="hidden" name="kakaoPlaceId" id="kakaoPlaceId" th:value="${post.kakaoPlaceId}">
+				            <input type="hidden" name="placeName" id="placeName" th:value="${post.placeName}">
+				            <input type="hidden" name="placeAddress" id="placeAddress" th:value="${post.placeAddress}">            
+				            <input type="hidden" name="placeLat" id="placeLat" th:value="${post.PlaceLat}">            
+				            <input type="hidden" name="placeLng" id="placeLng" th:value="${post.PlaceLng}">            
+				            
+				            <!-- 지도 영역 
+				               - 처음에는 "위치를 검색하면..." 텍스트를 보여줌
+				               - selectPlace() 호출 시 div 안에 실제 카카오 지도가 나옴
+				               - (div의 가로/세로 크기가 정해져 있어야 지도가 표시됨)
+				            -->
+				            <div id="map"
+				            style="width:100%; height:200px; border-radius:8px;
+				                            border:1px solid #ddd; background:#f9f9f9;
+				                            display:flex; align-items:center; justify-content:center;
+				                            color:#aaa; font-size:0.9rem;">
+				               위치를 검색하면 지도에 표시됩니다.
+				            </div>
+				
 			</div>
 
 			<div class="form-group">
@@ -88,9 +114,145 @@
 	</div>
 
 	<footer th:replace="~{fragments/layout :: footer}"></footer>
-
-
+	<script th:src="|https://dapi.kakao.com/v2/maps/sdk.js?appkey=${kakaoKey}&libraries=services|"></script>
 	<script>
+	      // -------------------------------------------
+	      // 카카오맵 장소 검색 + 지도 표시 스크립트
+	         
+	      // 카카오 장소 검색 서비스 객체 초기화
+	      // Places - 키워드로 장소를 검색해주는 카카오 내장 서비스
+	      var ps = new kakao.maps.services.Places();
+	      
+	      // 지도와 마커를 담을 변수(처음에는 비어있음 - 장소 선택 후 생성됨)
+	      var map = null;
+	      var marker = null;
+	      
+	      // --- 지도 초기화 함수 -----------------------
+	      // 위도(lat), 경도(lng)를 받아 지도를 그리고 마커를 꽂는 함수
+	      function initMap(lat, lng){
+	         // 지도를 그릴 div
+	         var container = document.getElementById("map");
+	         
+	         var options = {
+	            // 지도 중심 좌표
+	            center: new kakao.maps.LatLng(lat, lng),
+	            level : 4  // 줌 레벨(숫자가 클수록 넓은 범위 표시)
+	         };
+	         
+	         // map div 안의 텍스트 제거 - 실제 지도가 이 자리를 대체
+	         container.innerText = '';
+	         container.style.display = 'block';
+	         
+	         // 카카오 지도 생성
+	         map = new kakao.maps.Map(container, options);
+	         
+	         // 마커 생성 - 선택한 장소 위치에 핀 표시
+	         marker = new kakao.maps.Marker({
+	            position: new kakao.maps.LatLng(lat, lng),
+	            map : map
+	         }); 
+	      }
+	      
+	      // --- 장소 검색 함수 ------------------------
+	      // "지도에서 검색" 버튼 클릭 시 실행
+	      function searchPlace(){
+	         var keyword = document.getElementById('placeSearchInput').value.trim();
+	         
+	         if(!keyword){
+	            alert("장소명을 입력해주세요.");
+	            return;
+	         }
+	         
+	         // 카카오 서버에 키워드 장소 검색 요청
+	         // keywordSearch(검색어, 콜백함수) - 비동기:결과가 오면 콜백함수 실행
+	         ps.keywordSearch(keyword, function(data, status){
+	            if(status === kakao.maps.services.Status.OK){
+	               // 검색 성공 - 결과 목록 표시
+	               displayResults(data);
+	            }else if(status === kakao.maps.services.Status.ZERO_RESULT){
+	               alert('"' + keyword+ '"검색 결과가 없습니다.');
+	               document.getElementById("placeSearchResult").style.display= 'none';
+	            } else{
+	               alert("검색 중 오류가 발생했습니다. 잠시 후 다시 시도해주세요");
+	            }
+	         });
+	      }
+	      
+	      // --- 검색 결과 목록 표시 함수 ---------------------
+	      function displayResults(places){
+	         var resultEl = document.getElementById("placeSearchResult");
+	         resultEl.innerHTML=''; //  이전 결과 초기화
+	         resultEl.style.display = 'block'; // 결과 박스 보이기
+	         
+	         places.forEach(function(place){
+	            var item = document.createElement('div');
+	            item.style.cssText = 'padding:10px 12px; cursor:pointer; border-bottom:1px solid #eee';
+	            item.innerHTML = '<strong style="font-size:0.9rem;">' + place.place_name + '</strong><br>'+ 
+	            '<span style="font-size:0.8rem; color:#888;">' + 
+	            (place.road_address_name || place.address_name) + '</span>';
+	            // 도로명 주소 우선, 없으면 지번 주소
+	            
+	            // 마우스 올릴 때 배경색 변경(선택 가능한 항목임을 시작적으로 표시)
+	            item.onmouseover = function(){
+	               this.style.background = '#f5f5f5';
+	            };
+	            item.onmouseout = function(){
+	               this.style.background = '#fff';
+	            };
+	            // 클릭 시 해당 장소 선택
+	            item.onclick = function(){
+	               selectPlace(place);
+	            };
+	            resultEl.appendChild(item);         
+	         });
+	      }
+	      
+	      // --- 장소 선택 함수 ----------------------
+	      function selectPlace(place){
+	         // hidden 필드에 있는 값을 선택한 장소 값으로 채우기
+	         document.getElementById("kakaoPlaceId").value = place.id;
+	         document.getElementById("placeName").value = place.place_name;
+	         document.getElementById("placeAddress").value = place.road_address_name || place.address_name;
+	         document.getElementById("placeLat").value = place.y; // 위도
+	         document.getElementById("placeLng").value = place.x; // 경도
+	         
+	         // 검색 입력칸에 선택한 장소명 표시 
+	         document.getElementById('placeSearchInput').value = place.place_name;
+	         
+	         // 검색 결과 목록 숨기기
+	         document.getElementById("placeSearchResult").style.display = 'none';
+	         
+	         // 지도에 마커 표시
+	         var lat = parseFloat(place.y);
+	         var lng = parseFloat(place.x);
+	         initMap(lat, lng);
+	      }
+	      
+	      // --- 이벤트 연결 ---------------------
+	      // "지도에서 검색"버튼 클릭
+	      document.getElementById("placeSearchBtn")
+	         .addEventListener('click', searchPlace);
+	         
+	      // 검색 입력칸에서 Enter키 - 폼 제출 방지 후 장소 검색 실행
+	      document.getElementById('placeSearchInput')
+	         .addEventListener('keydown', function(e){
+	            if(e.key === 'Enter'){
+	               e.preventDefault(); 
+	               // Enter가 기본적으로 폼을 제출하므로 막아야 함
+	               searchPlace();
+	            }
+	         });
+	
+			 // 페이지 로드 시 기존에 저장된 위치를 지도에 바로 표시
+			 // hidden 필드에 채워진 기존 위도 / 경도를 읽어 지도를 초기화
+			 // 작성 폼과 다른 부분 : 검색하지 않아도 저장된 위치가 보임
+			 var savedLat = parseFloat(document.getElementById("placeLat").value);
+			 var savedLng = parseFloat(document.getElementById("placeLng").value);
+			 // 위도 경도 값을 가져오면 지도 초기화
+			 if(!isNaN(savedLat) && !isNaN(savedLng)){
+				initMap(savedLat, savedLng)
+			 }
+			 
 		// ===== 별점 클릭 처리 ===============
 		let stars = document.querySelectorAll(".rating-input span");
 		let ratingInput = document.querySelector("input[name='postRating']");
