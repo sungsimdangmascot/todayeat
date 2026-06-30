@@ -64,14 +64,15 @@ function renderComment(comment){
 	// (myComment는 서버에서 판단)
 	if(comment.myComment){
 		const deleteBtn = document.createElement('button');
-		deleteBtn.className="btn btn-danger btn-sm";
-		deleteBtn.textContent="삭제";
-		deleteBtn.onclick= function(){
+		deleteBtn.className = "btn btn-danger btn-sm";
+		deleteBtn.textContent = "삭제";
+		deleteBtn.onclick = function(){
 			// 댓글 삭제 요청 실행
 			deleteComment(comment.commentId);
 		};
 		header.appendChild(deleteBtn);
 	}
+	
 	
 	item.appendChild(header);
 	
@@ -123,31 +124,37 @@ function writeComment(){
 		}
 		input.value =''; // 입력창 초기화
 		loadComments(); // 목록 새로고침
-	});	
+	});
 }
 
-function deleteComment(commentId) {
-	if(!confirm("댓글을 삭제하시겠습니까?")){
-		return;
+// 4) 댓글 삭제
+function deleteComment(commentId){
+	if(!confirm("댓글 삭제하시겠습니까?")){
+		return; 
 	}
 	fetch("/comment/delete/" + commentId, {method:"POST"})
 		.then(function(response){
+			console.log("response : ", response);
 			if(response.status === 401){
 				window.location.href = "/member/login-form";
 				return null;
 			}
-			return response.json(); //응답을 JSON으로 반환
+			return response.json(); // 응답을 json으로 변환
 		})
 		.then(function(data){
 			console.log("data : ", data);
-			if(!data) {
+			if(!data){
 				return;
 			}
 			if(data.success){
-			loadComments(); // 목록 새로고침	
+				loadComments(); // 목록 새로고침
 			}
 		});
+	
 }
+
+
+
 
 
 

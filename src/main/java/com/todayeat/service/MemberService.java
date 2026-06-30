@@ -1,8 +1,12 @@
 package com.todayeat.service;
 
+import java.util.List;
+import java.util.Map;
+
 import org.springframework.stereotype.Service;
 
 import com.todayeat.dto.MemberDTO;
+import com.todayeat.dto.MemberSocialDTO;
 import com.todayeat.mapper.MemberMapper;
 
 import lombok.RequiredArgsConstructor;
@@ -14,6 +18,10 @@ import lombok.RequiredArgsConstructor;
 public class MemberService {
 
 	private final MemberMapper memberMapper;
+	// kakaoService 주입 - 카카오API 호출담당
+	private final KakaoService kakaoService;
+	// googleService 주입 - 구글API 호출담당
+	private final GoogleService googleService;  
 	
 	// 회원가입 처리
 	// 반환값 : true -> 가입 성공 / false -> 아이디 중복
@@ -103,6 +111,152 @@ public class MemberService {
 //	프로필 사진 경로 수정
 	public void updateProfileImg(MemberDTO memberDTO) {
 		memberMapper.updateProfileImg(memberDTO);
+	}
+	
+//	카카오 소셜 로그인 처리
+//	파라미터: code - 카카오가 전달한 인가코드(URL의 ?code=xxx)
+//	반환값 : 로그인된 회원 정보(MemberDTO)
+	@SuppressWarnings("unchecked") // Map캐스팅 경고 무시
+	public MemberDTO kakaoLogin(String code) {
+		
+//		(1) 인가코드 -> 액세스 토큰 교환
+//		카카오 서버에 인가코드를 보내고, 액세스 토큰을 받아옴
+		String accessToken = kakaoService.getAccessToken(code);
+		
+//		(2) 액세스 토큰 -> 카카오 사용자 정보 조회
+//		카카오 서버에 토큰을 보내고, 회원 정보를 받아옴
+		Map<String, Object> userInfo = kakaoService.getUserInfo(accessToken);
+		
+//		(3) 사용자 정보에서 필요한 값 꺼내기
+//		카카오 회원번호 - 카카오가 각 회원에게 부여하는 고유 숫자
+//		=> 우리 서버의 social_key
+		String socialKey = String.valueOf(userInfo.get("id"));
+		
+//		kakao_account 안에 이메일, 닉네임이 있음
+//		동의하지 않은 항목은 null이기 때문에 기본값 설정
+		String nickname = "카카오회원";
+		String email = ""; // 이메일 기본값
+		
+		Map<String, Object> kakaoAccount = (Map<String, Object>) userInfo.get("kakao_account");
+		
+		if(kakaoAccount != null) {
+			// 프로필 정보(닉네임)
+			Map<String, Object> profile = (Map<String, Object>)kakaoAccount.get("profile");
+			
+			if(profile != null && profile.get("profile_nickname") != null) {
+				nickname = (String)profile.get("profile_nickname");
+			}
+		}
+		
+//		4) MEMER_SOCIAL 조회 - 이미 카카오로 가입한 회원인지 확인
+//		처음 로그인이면 null 반환, 재방문이면 기존 회원 정보 반환
+		MemberDTO existMember = memberMapper.findBySocial("KAKAO", socialKey);
+		if(existMember != null) {
+			// 기존 회원 -> 바로 반환(세션에 저장할 정보)
+			return existMember;
+		}
+		
+//		5) 신규회원 - MEMBER테이블에 자동 기입
+//		카카오 로그인 회원은 우리 아이디/비밀번호 없이 자동으로 계정 생성
+		MemberDTO newMember = new MemberDTO();
+		newMember.setMemberLoginId("kakao_"+socialKey); // 아아디 : kakao_카카오번호
+		newMember.setMemberName(nickname);
+		newMember.setMemberEmail(email);
+		newMember.setMemberPwd("KAKAO_SOCIAL");
+		
+		memberMapper.join(newMember); // MEMBER테이블에 저장
+		
+//		6) MEMBER_SOCIAL 테이블에 연동 정보 저장
+//		방금 저장한 회원의 MEMBER_ID를 가져오기 위해 다시 조회
+		MemberDTO savedMember = memberMapper.findByLoginId("kakao_"+socialKey);
+		
+		MemberSocialDTO socialDTO = new MemberSocialDTO();
+		socialDTO.setMemberId(savedMember.getMemberId()); // 우리 회원번호
+		socialDTO.setSocialType("KAKAO");
+		socialDTO.setSocialKey(socialKey); // 카카오 회원 번호
+		
+		memberMapper.saveSocial(socialDTO); // MEMBER_SOCIAL 테이블에 저장
+		
+//		새로 가입한 회원 정보 반환(세션에 저장할 번호)
+		return savedMember;
+		
+	}
+	
+//	구글 소셜 로그인 
+//	파라미터 : code - 구글이 전달한 인가코드
+//	반환값 : 로그인된 회원 정보(MemberDTO)
+	public MemberDTO googleLogin(String code) {
+		
+//	 	(1) 인가코드 -> 액세스 토큰 교환
+		String accessToken = googleService.getAccessToken(code);
+		
+//		(2) 액세스 토큰 -> 구글 사용자 정보 조회
+		Map<String, Object> userInfo = googleService.getUserInfo(accessToken);
+		
+//		(3) 사용자 정보 추출
+//		구글 회원 고유번호
+		String socialKey = String.valueOf(userInfo.get("id"));
+		
+//		이름, 이메일
+		String nickname = "구글회원"; // 기본값
+		String email = ""; 
+		
+		if(userInfo.get("name") != null) {
+			nickname = (String) userInfo.get("name");
+		}
+		if(userInfo.get("email") != null) {
+			email = (String) userInfo.get("email");
+		}
+		
+//		(4) 기존 소셜 회원 확인 
+		MemberDTO existMember = memberMapper.findBySocial("GOOGLE", socialKey);
+		if(existMember != null) {
+			return existMember;
+		}
+		
+//		(5) 신규회원 가입 - MEMEBR테이블에 저장
+		MemberDTO newMember = new MemberDTO();
+		newMember.setMemberLoginId("google_"+socialKey); //아이디 : google_구글번호
+		newMember.setMemberName(nickname);
+		newMember.setMemberEmail(email);
+		newMember.setMemberPwd("GOOGLE_SOCIAL");
+		
+		memberMapper.join(newMember);
+		
+		// (6) MEMBER_SOCIAL 연동 정보 저장
+		
+		// 위에서 MEMBER테이블에 추가한 회원 정보 가져오기
+		MemberDTO savedMember = memberMapper.findByLoginId("google_"+socialKey);
+		
+		MemberSocialDTO socialDTO = new MemberSocialDTO();
+		socialDTO.setMemberId(savedMember.getMemberId());
+		socialDTO.setSocialType("GOOGLE");
+		socialDTO.setSocialKey(socialKey);
+		
+		memberMapper.saveSocial(socialDTO);
+		
+		return savedMember;
+	}
+	
+//	관리자 통계 - 정상(ACTIVE) 회원 수
+	public int countActiveMembers() {
+		return memberMapper.countActiveMembers();
+	}
+	
+//	관리자 통계 - 탈퇴 신청(WITHDRAW) 회원수
+	public int countWithdrawMembers() {
+		return memberMapper.countWithdrawMembers();
+	}
+	
+//	관리자 회원 목록 
+	public List<MemberDTO> findMembersForAdmin(String keyword,
+			int offset, int size){
+		return memberMapper.findMembersForAdmin(keyword, offset, size);
+	}
+	
+//	관리자 회원 목록 - 검색어 포함 전체 건수(페이징 계산용)
+	public int countMembersForAdmin(String keyword) {
+		return memberMapper.countMembersForAdmin(keyword);
 	}
 	
 	

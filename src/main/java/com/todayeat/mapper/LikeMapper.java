@@ -20,6 +20,14 @@ public interface LikeMapper {
 //	파라미터(매개변수)가 1개이므로 @Param생략 가능
 	int countByPostId(int postId);
 	
+//	5) 관리자 페이지 : 연쇄 삭제
+	
+//	특정 게시글의 좋아요 전부 삭제(그 글이 사라질때 함께)
+	void deleteByPost(int postId);
+	
+//	특정 회원이 누른 좋아요 전부 삭제(그 회원이 사라질때 함께)
+	void deleteByMember(int memberId);
+	
 
 }
 

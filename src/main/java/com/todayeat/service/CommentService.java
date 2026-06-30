@@ -35,6 +35,11 @@ public class CommentService {
 		commentMapper.delete(commentId, memberId);
 	}
 	
+//	관리자 통계 - 전체 댓글 수 
+	public int countAllComments() {
+		return commentMapper.countAllComments();
+	}
+	
 	
 
 }

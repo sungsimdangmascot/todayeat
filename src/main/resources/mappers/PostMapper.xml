@@ -97,7 +97,7 @@
 		    POST_RATING = #{postRating},
 		    <!-- 수정할 place_id가 있을때만 변경 -->
 		    <if test="placeId != null and placeId != 0">
-		    	PLACE_ID = #{placeId}, 
+		    	PLACE_ID = #{placeId},
 		    </if>
 		    <if test="postImg != null">
 		    	POST_IMG = #{postImg},
@@ -127,11 +127,11 @@
 		WHERE p.MEMBER_ID = #{memberId}
 		ORDER BY p.POST_ID DESC
 	</select>
-
-<!--
-	 map에 필요한 게시글, 장소 데이터 조회 
--->
-<select id="findAllForMap" resultType="com.todayeat.dto.PostDTO">
+	
+	<!-- 
+		map에 필요한 게시글, 장소 데이터 조회
+	-->
+	<select id="findAllForMap" resultType="com.todayeat.dto.PostDTO">
 	SELECT 
 		p.POST_ID,
 		p.POST_TITLE,
@@ -142,8 +142,22 @@
 		pl.PLACE_LNG
 	FROM POST p
 		JOIN PLACE pl ON p.PLACE_ID = pl.PLACE_ID
-		ORDER BY p.POST_ID DESC	
-</select>
+	ORDER BY p.POST_ID DESC
+	</select>
+	
+	<!-- 전체 게시글 수 : 관리자 통계 카드에 표시 -->
+	<select id="countAllPosts" resultType="int">
+		SELECT COUNT(*) FROM POST
+	</select>
+	
+	<!-- 특정 회원이 쓴 게시글의 번호 목록 -->
+	<select id="findIdsByMember" parameterType="int" resultType="int">
+		SELECT POST_ID 
+		FROM POST
+		WHERE MEMBER_ID = #{memberId}
+	</select>
+	
+
 
 </mapper>    
 

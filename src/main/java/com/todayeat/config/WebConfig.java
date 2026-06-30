@@ -1,9 +1,13 @@
 package com.todayeat.config;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+
+import com.todayeat.interceptor.AdminInterceptor;
 
 // @Configuration - 이 클래스가 spring 설정 클래스임을 알림
 // => 서버 시작 시 자동으로 읽혀서 설정이 적용됨
@@ -15,6 +19,9 @@ public class WebConfig implements WebMvcConfigurer {
 //	밑의 변수에 할당됨
 	@Value("${todayeat.upload.path}")
 	private String uploadPath;
+	
+	@Autowired
+	private AdminInterceptor adminInterceptor;
 
 //	addResourceHandlers - "어떤 URL 요청이 오면 어떤 폴더에서 파일을 찾을지"
 //	등록하는 메서드 spring이 서버 시작 시 이 메서드를 자동으로 호출함
@@ -29,6 +36,19 @@ public class WebConfig implements WebMvcConfigurer {
 //			- file:///C:/upload/todayeat 
 			.addResourceLocations("file:///" + uploadPath);
 	}
+
+//	인터셉터 등록 
+//	addInterceptors - 어떤 인터셉터를 어떤 URL에 적용할지 등록하는 메서드 
+	@Override
+	public void addInterceptors(InterceptorRegistry registry) {
+		registry
+			.addInterceptor(adminInterceptor)
+			// "/admin" 자체 + "/admin/**" (하위 경로) 모두 등록
+			// "/admin/**"만 쓰면 "/admin" 경로 자체는 패턴에서 빠짐
+			.addPathPatterns("/admin", "/admin/**");
+	}
+	
+	
 	
 	
 

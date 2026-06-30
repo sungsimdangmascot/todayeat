@@ -14,11 +14,14 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.todayeat.dto.MemberDTO;
 import com.todayeat.dto.PostDTO;
+import com.todayeat.service.GoogleService;
+import com.todayeat.service.KakaoService;
 import com.todayeat.service.MemberService;
 import com.todayeat.service.PostService;
 
@@ -34,6 +37,10 @@ public class MemberController {
 	private final MemberService memberService;
 //	PostService와 연결
 	private final PostService postService;
+//	KakaoService 연결
+	private final KakaoService kakaoService;
+//	GoogleService 연결
+	private final GoogleService googleService;
 	
 //	파일 업로드 경로
 	@Value("${todayeat.upload.path}")
@@ -254,6 +261,48 @@ public class MemberController {
 //		나중에 <img src="/upload/파일명"> 형태로 사용
 		return savedName;
 	}
+	
+	// GET /member/kakao/callback?code=xxxx
+	// 카카오 로그인 성공 후 카카오가 인가코드를 들고 우리 서버로 돌아오는 주소
+	@GetMapping("/kakao/callback")
+	public String kakaoCallback(@RequestParam(name="code") String code,
+			HttpSession session) {
+//		인가코드 -> 토큰 -> 사용자정보 -> DB연동 -> 회원 반환
+//		복잡한 처리는 모두 MemberService에서 담당
+		MemberDTO loginMember = memberService.kakaoLogin(code);
+		
+//		세션에 로그인 정보 저장
+		session.setAttribute("loginMember", loginMember);
+		
+//		메인 화면으로 이동
+		return "redirect:/";
+	}
+	
+//	구글 로그인 
+//	-> 서버가 구글 로그인 페이지 URL로 리다이렉트
+	@GetMapping("/google")
+	public String googleLogin() {
+		
+//		googleService가 만들어준 구글 로그인 URL로 이동
+		return "redirect:"+googleService.getAuthorizationUrl();
+	}
+	
+	// GET  /member/google/callback?code=xxxxxx
+//	구글 로그인 성공 후 구글이 인가코드를 들고 우리 서버로 돌아오는 주소
+	@GetMapping("/google/callback")
+	public String googleCallback(@RequestParam(name="code") String code,
+			HttpSession session) {
+		
+		MemberDTO loginMember = memberService.googleLogin(code);
+		
+		session.setAttribute("loginMember", loginMember);
+		
+		return "redirect:/";
+		
+	}
+	
+	
+	
 
 }
 

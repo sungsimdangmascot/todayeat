@@ -3,8 +3,11 @@ package com.todayeat.service;
 import java.util.List;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.todayeat.dto.PostDTO;
+import com.todayeat.mapper.CommentMapper;
+import com.todayeat.mapper.LikeMapper;
 import com.todayeat.mapper.PostMapper;
 
 import lombok.RequiredArgsConstructor;
@@ -14,6 +17,8 @@ import lombok.RequiredArgsConstructor;
 public class PostService {
 	
 	private final PostMapper postMapper;
+	private final CommentMapper commentMapper;
+	private final LikeMapper likeMapper;
 	
 //	1) 게시글 저장
 	public void write(PostDTO postDTO) {
@@ -41,7 +46,11 @@ public class PostService {
 	}
 	
 //	5) 게시글 삭제
+	@Transactional
 	public void delete(int postId) {
+//		FK 걸려 있는 댓글 좋아요 삭제
+		likeMapper.deleteByPost(postId);
+		commentMapper.deleteByPost(postId);
 		postMapper.delete(postId);
 	}
 	
@@ -55,6 +64,11 @@ public class PostService {
 		return postMapper.findAllForMap();
 	}
 
+//	관리자 통계 - 전체 게시글 수 
+	public int countAllPosts() {
+		return postMapper.countAllPosts();
+	}
+	
 }
 
 

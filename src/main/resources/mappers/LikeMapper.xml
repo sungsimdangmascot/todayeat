@@ -31,6 +31,16 @@
 		WHERE POST_ID = #{postId}
 	</select>
 	
+	<!-- 관리자 페이지 : 회원 연쇄 삭제 -->
+	<!-- 1) 특정 게시글의 좋아요 전부 삭제-->
+	<delete id="deleteByPost" parameterType="int">
+		DELETE FROM POST_LIKE WHERE POST_ID = #{postId}
+	</delete>
+	<!-- 2) 특정 회원이 누른 좋아요 전부 삭제 -->
+	<delete id="deleteByMember" parameterType="int">
+		DELETE FROM POST_LIKE WHERE MEMBER_ID = #{memberId}
+	</delete>
+	
 	
 </mapper>
 

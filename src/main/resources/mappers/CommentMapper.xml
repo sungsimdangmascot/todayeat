@@ -40,6 +40,20 @@
 			WHERE COMMENT_ID = #{commentId} AND MEMBER_ID = #{memberId}
 	</delete>
 	
+	<!--관리자 통계 : 전체 댓글 수 -->
+	<select id="countAllComments" resultType="int">
+		SELECT COUNT(*) FROM COMMENT
+	</select>
+	
+	<!-- 특정 게시글의 댓글 전부 삭제 -->
+	<delete id="deleteByPost" parameterType="int">
+		DELETE FROM COMMENT WHERE POST_ID = #{postId}
+	</delete>
+	<!-- 특정 회원이 쓴 댓글 전부 삭제 -->
+	<delete id="deleteByMember" parameterType="int">
+		DELETE FROM COMMENT WHERE MEMBER_ID = #{memberId}
+	</delete>
+	
 	
 
 </mapper>

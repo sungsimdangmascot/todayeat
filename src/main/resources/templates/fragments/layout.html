@@ -22,6 +22,11 @@
             </span>
             <a th:href="@{/post/write}" class="btn-nav">✏️ 글쓰기</a>
             <a th:href="@{/member/mypage}">마이페이지</a>
+			<!-- ADMIN일 때 관리자 페이지로 이동 -->
+			<a th:href="@{/admin}" th:if="${session.loginMember.memberRole == 'ADMIN'}"
+				style="color: #e74c3c; font-weight: bold;">
+				⚙ 관리자
+			</a>
             <a th:href="@{/member/logout}">로그아웃</a>
          </th:block>
       </nav>

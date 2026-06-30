@@ -38,9 +38,15 @@ public interface PostMapper {
 //	마이페이지 - 특정 회원이 쓴 게시글 목록 조회
 	List<PostDTO> findByMemberId(int memberId);
 	
-//	map 전체 지도용 - 모든 게시글 좌표, 제목, 별점을 한꺼번에 조회
+//	map전체 지도용 - 모든 게시글의 좌표, 제목, 별점을 한꺼번에 조회
 //	페이징 없이 전체 반환
 	List<PostDTO> findAllForMap();
+	
+//	관리자 통계 - 전체 게시글 수
+	int countAllPosts();
+	
+//	특정 회원이 쓴 게시글들의 번호(ID) 목록 - 연쇄 삭제 때 하나씩 처리
+	List<Integer> findIdsByMember(int memberId);
 }
 
 

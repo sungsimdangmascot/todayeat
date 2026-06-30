@@ -54,6 +54,86 @@
 	</update>
 	
 	
+	<!--
+		소셜 타입 + 소셜 키로 연동된 회원 조회
+		
+		ex) socialType = "KAKAO", socialKey="12345"로 조회하면
+		해당 카카오 계정으로 가입한 우리 DB 회원 정보가 반환됨
+	-->
+	<select id="findBySocial" resultType="com.todayeat.dto.MemberDTO">
+		SELECT m.*
+		FROM MEMBER m
+			JOIN MEMBER_SOCIAL ms on m.MEMBER_ID = ms.MEMBER_ID
+		WHERE ms.SOCIAL_TYPE = #{socialType}
+			AND ms.SOCIAL_KEY = #{socialKey}
+	</select>
+	
+	<!--
+		MEMBER_SOCIAL 테이블에 소셜 연동 정보 INSERT
+		카카오 첫 로그인 시 MEMBER 테이블에 회원을 만든 뒤
+		MEMBER_SOCIAL에도 연동 정보를 저장
+	-->
+	<insert id="saveSocial" parameterType="com.todayeat.dto.MemberSocialDTO">
+		INSERT INTO MEMBER_SOCIAL(MEMBER_ID, SOCIAL_TYPE, SOCIAL_KEY)
+			VALUES(#{memberId}, #{socialType}, #{socialKey})
+	</insert>
+	
+	<!-- 통계 : 정상 회원 수 -->
+	<select id="countActiveMembers" resultType="int">
+		SELECT COUNT(*)
+		FROM MEMBER
+		WHERE MEMBER_STATUS = 'ACTIVE'
+	</select>
+	
+	<!-- 통계 : 탈퇴 신청 회원 수 -->
+	<select id="countWithdrawMembers" resultType="int">
+		SELECT COUNT(*)
+		FROM MEMBER
+		WHERE MEMBER_STATUS = 'WITHDRAW'	
+	</select>
+	
+	<!--
+		관리자 회원 목록 - 검색 + 페이징
+	-->
+	<select id="findMembersForAdmin" resultType="com.todayeat.dto.MemberDTO">
+		SELECT *
+		FROM MEMBER
+		WHERE MEMBER_STATUS = 'ACTIVE'
+		<if test="keyword != null and keyword != ''">
+			AND (MEMBER_NAME LIKE CONCAT('%', #{keyword}, '%')
+				OR MEMBER_EMAIL LIKE CONCAT('%', #{keyword}, '%'))
+		</if>
+		ORDER BY MEMBER_ID DESC
+		LIMIT #{size} OFFSET #{offset}
+	</select>
+	
+	<!-- 
+		관리자 회원 목록 전체 건수 - 페이징 계산용
+	 -->
+	 <select id="countMembersForAdmin" resultType="int">
+	 SELECT COUNT(*)
+	 FROM MEMBER
+	 WHERE MEMBER_STATUS = 'ACTIVE'
+	<if test="keyword != null and keyword != ''">
+		AND (MEMBER_NAME LIKE CONCAT('%', #{keyword}, '%')
+		OR MEMBER_EMAIL LIKE CONCAT('%', #{keyword}, '%'))
+	</if>
+	</select>
+	
+	<!--
+		연쇄 삭제용-이 회원의 소셜 로그인 연결 삭제
+	-->
+	<delete id="deleteSocialByMember" parameterType="int">
+		DELETE FROM MEMBER_SOCIAL WHERE MEMBER_ID = #{memberId}
+	</delete>
+	
+	<!-- 
+		연쇄 삭제용-회원 삭제
+	-->
+	<delete id="deleteById" parameterType="int">
+		DELETE FROM MEMBER WHERE MEMBER_ID = #{memberId}
+	</delete>
+	
 </mapper>
 
 
