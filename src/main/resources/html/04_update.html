@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>오늘뭐먹지 - 게시글 수정</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header class="header">
+    <a class="logo" href="01_main.html">🍽 오늘뭐먹지</a>
+    <nav class="nav">
+        <a href="08_map.html">📍 지도</a>
+        <span class="user-name">안녕하세요, 홍길동님</span>
+        <a href="03_write.html" class="btn-nav">✏️ 글쓰기</a>
+        <a href="07_mypage.html">마이페이지</a>
+        <a href="05_login.html">로그아웃</a>
+    </nav>
+</header>
+
+<div class="container" style="max-width: 760px;">
+    <div class="page-title">✏️ 맛집 후기 수정</div>
+
+    <div class="card">
+
+        <div class="form-group">
+            <label>제목 *</label>
+            <input class="form-control" type="text" value="을지로 노포 곱창집, 진짜 현지 맛이에요">
+        </div>
+
+        <div class="form-group">
+            <label>별점 *</label>
+            <div class="rating-input">
+                <span class="active">★</span>
+                <span class="active">★</span>
+                <span class="active">★</span>
+                <span class="active">★</span>
+                <span class="active">★</span>
+            </div>
+            <div class="text-muted text-sm mt-8">별을 클릭해서 별점을 변경하세요</div>
+        </div>
+
+        <div class="form-group">
+            <label>📍 맛집 위치 *</label>
+            <div class="flex gap-8 mb-8">
+                <input class="form-control" type="text" value="서울 중구 을지로3가" style="flex:1;">
+                <button class="btn btn-outline">위치 변경</button>
+            </div>
+            <!-- 기존 위치가 지도에 표시된 상태 -->
+            <div class="map-placeholder" style="height: 200px; background: #dde8dd;">
+                <span class="map-icon">📍</span>
+                <span>서울 중구 을지로3가 (기존 위치)</span>
+                <span style="font-size:0.8rem; color:#6a9a6a;">(카카오맵 API)</span>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label>사진</label>
+            <!-- 기존에 저장돼 있던 사진 (새 사진을 고르면 아래 미리보기로 가려짐) -->
+            <div id="currentImg" class="img-placeholder" style="height:140px; margin-bottom:10px; background:#d8d8d8;">
+                기존 사진 미리보기
+            </div>
+            <!-- 새로 선택한 사진 미리보기 — 파일을 고르기 전에는 숨겨둔다 -->
+            <img id="imgPreview" alt="새 사진 미리보기"
+                 style="display:none; max-width:100%; max-height:200px; object-fit:cover; border-radius:8px; margin-bottom:10px;">
+            <input type="file" id="imgInput" accept="image/*" style="font-size:0.85rem;">
+            <div class="text-muted text-sm mt-8">새 파일을 선택하면 기존 사진이 교체됩니다</div>
+        </div>
+
+        <div class="form-group">
+            <label>후기 내용 *</label>
+            <textarea class="form-control" rows="6">을지로 뒷골목에 숨어있는 30년 전통 곱창집입니다.
+평일 저녁에도 웨이팅이 있을 만큼 현지인들에게 인기가 많아요.
+곱창 특유의 냄새 없이 깔끔하게 손질이 되어 있고,
+양념 맛이 진하지 않아서 재료 본연의 맛을 즐길 수 있었습니다.
+
+소주 한 잔과 함께라면 더할 나위 없는 조합이에요. 강력 추천!</textarea>
+        </div>
+
+        <div class="flex-between" style="margin-top:8px;">
+            <a href="02_detail.html"><button class="btn btn-secondary">취소</button></a>
+            <a href="02_detail.html"><button class="btn btn-primary" style="padding: 10px 32px;">수정 완료</button></a>
+        </div>
+
+    </div>
+</div>
+
+<footer class="footer">ⓒ 2025 오늘뭐먹지</footer>
+
+<!-- ===== 사진 업로드 미리보기 ===== -->
+<script>
+    // [1] 파일 선택칸 · 새 사진 미리보기 · 기존 사진 박스를 가져온다
+    const imgInput   = document.getElementById('imgInput');     // <input type="file">
+    const imgPreview = document.getElementById('imgPreview');   // 새로 고른 사진 미리보기
+    const currentImg = document.getElementById('currentImg');   // 기존에 저장된 사진 박스
+
+    // [2] 새 파일을 선택하면 그 사진을 보여주고, 기존 사진 박스는 숨긴다
+    imgInput.addEventListener('change', function () {
+        const file = imgInput.files[0];
+        if (!file) return;
+
+        const reader = new FileReader();              // 파일을 화면에 쓸 수 있는 형태로 읽는 도구
+        reader.onload = function (e) {
+            imgPreview.src = e.target.result;
+            imgPreview.style.display = 'block';       // 새 사진 미리보기 표시
+            currentImg.style.display = 'none';        // 기존 사진 박스는 숨김
+        };
+        reader.readAsDataURL(file);
+    });
+</script>
+
+</body>
+</html>

@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+	<meta charset="UTF-8">
+	<title>오늘뭐먹지 - 게시글 작성</title>
+	<link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+
+<body>
+
+	<header th:replace="~{fragments/layout :: header}">
+	</header>
+
+	<div class="container" style="max-width: 760px;">
+		<div class="page-title">✏️ 맛집 후기 작성</div>
+		
+		<!-- enctype="multipart/form-data" 사진 파일을 전송하기 위해 작성 -->
+		<form class="card" th:action="@{/post/write}" method="post" enctype="multipart/form-data">
+
+			<div class="form-group">
+				<label>제목 *</label>
+				<input name="postTitle"class="form-control" type="text" placeholder="제목을 입력하세요">
+			</div>
+
+			<div class="form-group">
+				<label>별점 *</label>
+				<div class="rating-input">
+					<span class="active">★</span>
+					<span class="active">★</span>
+					<span class="active">★</span>
+					<span class="active">★</span>
+					<span>★</span>
+				</div>
+				<!-- 별점값 js에서 클릭시 value를 업데이트 -->
+				<input type="hidden" name="postRating" value="4">
+				<div class="text-muted text-sm mt-8">별을 클릭해서 별점을 선택하세요 (1~5점)</div>
+			</div>
+
+			<div class="form-group">
+				<label>📍 맛집 위치 *</label>
+				<div class="flex gap-8 mb-8">
+					<input class="form-control" type="text" 
+						id = "placeSearchInput"
+						placeholder="장소명으로 검색하세요" style="flex:1;">
+					<button class="btn btn-outline"
+						type="button"
+						id="placeSearchBtn">
+						지도에서 검색
+					</button>
+				</div>
+				<!-- 
+					검색 결과 목록 - searchPlace() 실행 후 
+					이 안에 결과 항목이 채워짐
+					처음에는 display:none으로 숨겨두고, 
+					검색 결과가 생기면 보이게 전환
+				-->
+				<div id="placeSearchResult"
+					style="border:1px solid #ddd; border-radius:6px; max-height:180px;
+				          overflow-y:auto; margin-bottom:8px; display:none;">
+				</div>
+				
+				<!-- 카카오맵 API가 선택한 장소 정보를 아래 hidden 필드에 채움 -->
+				<input type="hidden" name="kakaoPlaceId" id="kakaoPlaceId">
+				<input type="hidden" name="placeName" id="placeName">
+				<input type="hidden" name="placeAddress" id="placeAddress">				
+				<input type="hidden" name="placeLat" id="placeLat">				
+				<input type="hidden" name="placeLng" id="placeLng">				
+				
+				<!-- 지도 영역 
+					- 처음에는 "위치를 검색하면..." 텍스트를 보여줌
+					- selectPlace() 호출 시 div 안에 실제 카카오 지도가 나옴
+					- (div의 가로/세로 크기가 정해져 있어야 지도가 표시됨)
+				-->
+				<div id="map"
+				style="width:100%; height:200px; border-radius:8px;
+				                border:1px solid #ddd; background:#f9f9f9;
+				                display:flex; align-items:center; justify-content:center;
+				                color:#aaa; font-size:0.9rem;">
+					위치를 검색하면 지도에 표시됩니다.
+				</div>
+			</div>
+
+			<div class="form-group">
+				<label>사진 업로드</label>
+				<!-- 파일 선택 버튼을 눌러 사진을 올린다 (브라우저 기본 업로드 버튼) -->
+				<input type="file" name="imgFile" id="imgInput" accept="image/*" style="font-size:0.85rem;">
+				<div class="text-muted text-sm mt-8">JPG, PNG 파일 · 최대 10MB</div>
+				<!-- 선택한 사진 미리보기 — 파일을 고르기 전에는 숨겨둔다 -->
+				<img id="imgPreview" alt="미리보기"
+					style="display:none; max-width:100%; max-height:200px; object-fit:cover; border-radius:8px; margin-top:10px;">
+			</div>
+
+			<div class="form-group">
+				<label>후기 내용 *</label>
+				<textarea name="postContent" class="form-control" rows="6"
+					placeholder="맛집에 대한 솔직한 후기를 작성해주세요 (맛, 가격, 분위기, 재방문 의사 등)"></textarea>
+			</div>
+
+			<div class="flex-between" style="margin-top:8px;">
+				<a th:href="@{/}"><button class="btn btn-secondary">취소</button></a>
+				<button type="submit" class="btn btn-primary" style="padding: 10px 32px;">등록하기</button>
+			</div>
+
+		</form>
+	</div>
+
+	<footer th:replace="~{fragments/layout :: footer}"></footer>
+	<!-- 
+		카카오 맵 SDK로드
+		th:src - Thymeleaf가 ${kakaoKey} 를 실제 key로 넣어줌
+		libraries=services - 장소 검색 기능을 함께 로드(없으면 검색 불가)
+	-->
+	<script th:src="|https://dapi.kakao.com/v2/maps/sdk.js?appkey=${kakaoKey}&libraries=services|"></script>
+	
+	<script>
+		// -------------------------------------------
+		// 카카오맵 장소 검색 + 지도 표시 스크립트
+			
+		// 카카오 장소 검색 서비스 객체 초기화
+		// Places - 키워드로 장소를 검색해주는 카카오 내장 서비스
+		var ps = new kakao.maps.services.Places();
+		
+		// 지도와 마커를 담을 변수(처음에는 비어있음 - 장소 선택 후 생성됨)
+		var map = null;
+		var marker = null;
+		
+		// --- 지도 초기화 함수 -----------------------
+		// 위도(lat), 경도(lng)를 받아 지도를 그리고 마커를 꽂는 함수
+		function initMap(lat, lng){
+			// 지도를 그릴 div
+			var container = document.getElementById("map");
+			
+			var options = {
+				// 지도 중심 좌표
+				center: new kakao.maps.LatLng(lat, lng),
+				level : 4  // 줌 레벨(숫자가 클수록 넓은 범위 표시)
+			};
+			
+			// map div 안의 텍스트 제거 - 실제 지도가 이 자리를 대체
+			container.innerText = '';
+			container.style.display = 'block';
+			
+			// 카카오 지도 생성
+			map = new kakao.maps.Map(container, options);
+			
+			// 마커 생성 - 선택한 장소 위치에 핀 표시
+			marker = new kakao.maps.Marker({
+				position: new kakao.maps.LatLng(lat, lng),
+				map : map
+			}); 
+		}
+		
+		// --- 장소 검색 함수 ------------------------
+		// "지도에서 검색" 버튼 클릭 시 실행
+		function searchPlace(){
+			var keyword = document.getElementById('placeSearchInput').value.trim();
+			
+			if(!keyword){
+				alert("장소명을 입력해주세요.");
+				return;
+			}
+			
+			// 카카오 서버에 키워드 장소 검색 요청
+			// keywordSearch(검색어, 콜백함수) - 비동기:결과가 오면 콜백함수 실행
+			ps.keywordSearch(keyword, function(data, status){
+				if(status === kakao.maps.services.Status.OK){
+					// 검색 성공 - 결과 목록 표시
+					displayResults(data);
+				}else if(status === kakao.maps.services.Status.ZERO_RESULT){
+					alert('"' + keyword+ '"검색 결과가 없습니다.');
+					document.getElementById("placeSearchResult").style.display= 'none';
+				} else{
+					alert("검색 중 오류가 발생했습니다. 잠시 후 다시 시도해주세요");
+				}
+			});
+		}
+		
+		// --- 검색 결과 목록 표시 함수 ---------------------
+		function displayResults(places){
+			var resultEl = document.getElementById("placeSearchResult");
+			resultEl.innerHTML=''; //  이전 결과 초기화
+			resultEl.style.display = 'block'; // 결과 박스 보이기
+			
+			places.forEach(function(place){
+				var item = document.createElement('div');
+				item.style.cssText = 'padding:10px 12px; cursor:pointer; border-bottom:1px solid #eee';
+				item.innerHTML = '<strong style="font-size:0.9rem;">' + place.place_name + '</strong><br>'+ 
+				'<span style="font-size:0.8rem; color:#888;">' + 
+				(place.road_address_name || place.address_name) + '</span>';
+				// 도로명 주소 우선, 없으면 지번 주소
+				
+				// 마우스 올릴 때 배경색 변경(선택 가능한 항목임을 시작적으로 표시)
+				item.onmouseover = function(){
+					this.style.background = '#f5f5f5';
+				};
+				item.onmouseout = function(){
+					this.style.background = '#fff';
+				};
+				// 클릭 시 해당 장소 선택
+				item.onclick = function(){
+					selectPlace(place);
+				};
+				resultEl.appendChild(item);			
+			});
+		}
+		
+		// --- 장소 선택 함수 ----------------------
+		function selectPlace(place){
+			// hidden 필드에 있는 값을 선택한 장소 값으로 채우기
+			document.getElementById("kakaoPlaceId").value = place.id;
+			document.getElementById("placeName").value = place.place_name;
+			document.getElementById("placeAddress").value = place.road_address_name || place.address_name;
+			document.getElementById("placeLat").value = place.y; // 위도
+			document.getElementById("placeLng").value = place.x; // 경도
+			
+			// 검색 입력칸에 선택한 장소명 표시 
+			document.getElementById('placeSearchInput').value = place.place_name;
+			
+			// 검색 결과 목록 숨기기
+			document.getElementById("placeSearchResult").style.display = 'none';
+			
+			// 지도에 마커 표시
+			var lat = parseFloat(place.y);
+			var lng = parseFloat(place.x);
+			initMap(lat, lng);
+		}
+		
+		// --- 이벤트 연결 ---------------------
+		// "지도에서 검색"버튼 클릭
+		document.getElementById("placeSearchBtn")
+			.addEventListener('click', searchPlace);
+			
+		// 검색 입력칸에서 Enter키 - 폼 제출 방지 후 장소 검색 실행
+		document.getElementById('placeSearchInput')
+			.addEventListener('keydown', function(e){
+				if(e.key === 'Enter'){
+					e.preventDefault(); 
+					// Enter가 기본적으로 폼을 제출하므로 막아야 함
+					searchPlace();
+				}
+			});
+
+	
+		// ===== 별점 클릭 처리 ===============
+		let stars  = document.querySelectorAll(".rating-input span");
+		let ratingInput = document.querySelector("input[name='postRating']");
+		
+		// console.log(stars);
+		// console.log(ratingInput);
+		
+		// 별 표시 업데이트 - rating 개수만큼 active(노란색), 나머지는 비활성화
+		function updateStars(rating){
+			stars.forEach(function(s, i){
+				if(i < rating){
+					s.classList.add("active");
+				} else{
+					s.classList.remove("active");
+				}
+			});
+		}
+		
+		stars.forEach(function(star, index){
+			// 클릭 이벤트 - 별점 확정 + hidden필드 값 변경
+			star.addEventListener("click", function(){
+				ratingInput.value = index + 1;
+				updateStars(index + 1);
+				console.log(ratingInput);
+			});
+			
+			// 마우스 올릴때 - 미리보기(해당 별까지 노란색으로 표시)
+			star.addEventListener("mouseover", function(){
+				updateStars(index + 1);
+			});
+			
+			// 마우스 나갈때 - 현재 확정된 별점으로 유지
+		 	star.addEventListener("mouseout", function(){
+				updateStars(parseInt(ratingInput.value));
+			});
+		});
+		
+	
+	
+		// ===== 사진 업로드 미리보기 ===== 
+		// [1] 파일 선택칸과 미리보기 이미지를 가져온다
+		const imgInput = document.getElementById('imgInput');    // <input type="file">
+		const imgPreview = document.getElementById('imgPreview');  // 미리보기 <img>
+
+		// [2] 파일을 선택하면(change) 그 사진을 화면에 미리 보여준다
+		imgInput.addEventListener('change', function () {
+			const file = imgInput.files[0];               // 선택한 파일 (없으면 undefined)
+			if (!file) return;
+
+			const reader = new FileReader();              // 파일을 화면에 쓸 수 있는 형태로 읽는 도구
+			reader.onload = function (e) {
+				imgPreview.src = e.target.result;         // 읽어들인 이미지를 미리보기에 넣음
+				imgPreview.style.display = 'block';       // 숨겨둔 미리보기를 보이게 함
+			};
+			reader.readAsDataURL(file);                   // 파일 읽기 시작
+		});
+	</script>
+
+</body>
+
+</html>

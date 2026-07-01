@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>오늘뭐먹지 - 게시글 상세</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header class="header">
+    <a class="logo" href="01_main.html">🍽 오늘뭐먹지</a>
+    <nav class="nav">
+        <a href="08_map.html">📍 지도</a>
+        <span class="user-name">안녕하세요, 홍길동님</span>
+        <a href="03_write.html" class="btn-nav">✏️ 글쓰기</a>
+        <a href="07_mypage.html">마이페이지</a>
+        <a href="05_login.html">로그아웃</a>
+    </nav>
+</header>
+
+<div class="container" style="max-width: 800px;">
+
+    <!-- 게시글 헤더 -->
+    <div class="card">
+        <div class="flex-between mb-8">
+            <h2 style="font-size:1.4rem;">을지로 노포 곱창집, 진짜 현지 맛이에요</h2>
+            <span class="stars">★★★★★</span>
+        </div>
+        <div class="text-muted text-sm mb-16">
+            📍 서울 을지로3가 &nbsp;|&nbsp; 작성자: <strong>홍길동</strong> &nbsp;|&nbsp; 2025.04.23
+        </div>
+
+        <!-- 대표 사진 -->
+        <div class="img-placeholder" style="height: 320px; margin-bottom: 20px;">
+            대표 사진
+        </div>
+
+        <!-- 본문 -->
+        <p style="line-height: 1.8; color: #444;">
+            을지로 뒷골목에 숨어있는 30년 전통 곱창집입니다.<br>
+            평일 저녁에도 웨이팅이 있을 만큼 현지인들에게 인기가 많아요.<br>
+            곱창 특유의 냄새 없이 깔끔하게 손질이 되어 있고,<br>
+            양념 맛이 진하지 않아서 재료 본연의 맛을 즐길 수 있었습니다.<br><br>
+            소주 한 잔과 함께라면 더할 나위 없는 조합이에요. 강력 추천!
+        </p>
+
+        <hr class="divider">
+
+        <!-- 지도 -->
+        <div class="mb-8"><strong>📍 맛집 위치</strong></div>
+        <div class="map-placeholder" style="height: 200px; margin-bottom: 20px;">
+            <span class="map-icon">🗺</span>
+            <span>카카오맵 — 서울 중구 을지로3가</span>
+        </div>
+
+        <!-- 좋아요 + 수정/삭제 -->
+        <div class="flex-between">
+            <button class="like-btn liked">♥ 좋아요 &nbsp;<strong>24</strong></button>
+            <div class="flex gap-8">
+                <a href="04_update.html"><button class="btn btn-outline btn-sm">수정</button></a>
+                <button class="btn btn-danger btn-sm">삭제</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 댓글 -->
+    <div class="card">
+        <h3 style="margin-bottom:16px;">댓글 <span style="color:#4a90d9;">3</span></h3>
+
+        <div class="comment-item">
+            <div class="comment-header">
+                <div class="flex gap-8" style="align-items:center;">
+                    <strong class="comment-author">김철수</strong>
+                    <span class="comment-date">2025.04.23 14:32</span>
+                </div>
+                <button class="btn btn-danger btn-sm">삭제</button>
+            </div>
+            <div class="comment-body">저도 여기 가봤는데 진짜 맛있었어요! 재방문 의사 100%</div>
+        </div>
+
+        <div class="comment-item">
+            <div class="comment-header">
+                <div class="flex gap-8" style="align-items:center;">
+                    <strong class="comment-author">이영희</strong>
+                    <span class="comment-date">2025.04.23 16:10</span>
+                </div>
+            </div>
+            <div class="comment-body">웨이팅 얼마나 기다렸나요? 주말에 가보려고요 🙂</div>
+        </div>
+
+        <div class="comment-item" style="border-bottom:none;">
+            <div class="comment-header">
+                <div class="flex gap-8" style="align-items:center;">
+                    <strong class="comment-author">홍길동</strong>
+                    <span class="comment-date">2025.04.23 17:05</span>
+                    <span class="badge badge-primary">작성자</span>
+                </div>
+                <button class="btn btn-danger btn-sm">삭제</button>
+            </div>
+            <div class="comment-body">평일은 30분 정도, 주말은 1시간 이상 기다렸어요!</div>
+        </div>
+
+        <!-- 댓글 입력 -->
+        <div style="margin-top:20px; padding-top:16px; border-top:1px solid #eee;">
+            <div class="flex gap-8">
+                <input class="form-control" type="text" placeholder="댓글을 입력하세요 (비동기 처리)">
+                <button class="btn btn-primary" style="white-space:nowrap;">등록</button>
+            </div>
+        </div>
+    </div>
+
+    <a href="01_main.html"><button class="btn btn-secondary">← 목록으로</button></a>
+
+</div>
+
+<footer class="footer">ⓒ 2025 오늘뭐먹지</footer>
+
+</body>
+</html>

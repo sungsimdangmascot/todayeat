@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>오늘뭐먹지 - 게시글 작성</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header class="header">
+    <a class="logo" href="01_main.html">🍽 오늘뭐먹지</a>
+    <nav class="nav">
+        <a href="08_map.html">📍 지도</a>
+        <span class="user-name">안녕하세요, 홍길동님</span>
+        <a href="03_write.html" class="btn-nav">✏️ 글쓰기</a>
+        <a href="07_mypage.html">마이페이지</a>
+        <a href="05_login.html">로그아웃</a>
+    </nav>
+</header>
+
+<div class="container" style="max-width: 760px;">
+    <div class="page-title">✏️ 맛집 후기 작성</div>
+
+    <div class="card">
+
+        <div class="form-group">
+            <label>제목 *</label>
+            <input class="form-control" type="text" placeholder="제목을 입력하세요">
+        </div>
+
+        <div class="form-group">
+            <label>별점 *</label>
+            <div class="rating-input">
+                <span class="active">★</span>
+                <span class="active">★</span>
+                <span class="active">★</span>
+                <span class="active">★</span>
+                <span>★</span>
+            </div>
+            <div class="text-muted text-sm mt-8">별을 클릭해서 별점을 선택하세요 (1~5점)</div>
+        </div>
+
+        <div class="form-group">
+            <label>📍 맛집 위치 *</label>
+            <div class="flex gap-8 mb-8">
+                <input class="form-control" type="text" placeholder="장소명으로 검색하세요" style="flex:1;">
+                <button class="btn btn-outline">지도에서 검색</button>
+            </div>
+            <div class="map-placeholder" style="height: 200px;">
+                <span class="map-icon">🗺</span>
+                <span>위치를 검색하면 지도에 표시됩니다</span>
+                <span style="font-size:0.8rem; color:#aaa;">(카카오맵 API)</span>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label>사진 업로드</label>
+            <!-- 파일 선택 버튼을 눌러 사진을 올린다 (브라우저 기본 업로드 버튼) -->
+            <input type="file" id="imgInput" accept="image/*" style="font-size:0.85rem;">
+            <div class="text-muted text-sm mt-8">JPG, PNG 파일 · 최대 10MB</div>
+            <!-- 선택한 사진 미리보기 — 파일을 고르기 전에는 숨겨둔다 -->
+            <img id="imgPreview" alt="미리보기"
+                 style="display:none; max-width:100%; max-height:200px; object-fit:cover; border-radius:8px; margin-top:10px;">
+        </div>
+
+        <div class="form-group">
+            <label>후기 내용 *</label>
+            <textarea class="form-control" rows="6" placeholder="맛집에 대한 솔직한 후기를 작성해주세요 (맛, 가격, 분위기, 재방문 의사 등)"></textarea>
+        </div>
+
+        <div class="flex-between" style="margin-top:8px;">
+            <a href="01_main.html"><button class="btn btn-secondary">취소</button></a>
+            <button class="btn btn-primary" style="padding: 10px 32px;">등록하기</button>
+        </div>
+
+    </div>
+</div>
+
+<footer class="footer">ⓒ 2025 오늘뭐먹지</footer>
+
+<!-- ===== 사진 업로드 미리보기 ===== -->
+<script>
+    // [1] 파일 선택칸과 미리보기 이미지를 가져온다
+    const imgInput   = document.getElementById('imgInput');    // <input type="file">
+    const imgPreview = document.getElementById('imgPreview');  // 미리보기 <img>
+
+    // [2] 파일을 선택하면(change) 그 사진을 화면에 미리 보여준다
+    imgInput.addEventListener('change', function () {
+        const file = imgInput.files[0];               // 선택한 파일 (없으면 undefined)
+        if (!file) return;
+
+        const reader = new FileReader();              // 파일을 화면에 쓸 수 있는 형태로 읽는 도구
+        reader.onload = function (e) {
+            imgPreview.src = e.target.result;         // 읽어들인 이미지를 미리보기에 넣음
+            imgPreview.style.display = 'block';       // 숨겨둔 미리보기를 보이게 함
+        };
+        reader.readAsDataURL(file);                   // 파일 읽기 시작
+    });
+</script>
+
+</body>
+</html>
