@@ -2,13 +2,20 @@
 <html lang="ko" xmlns:th="http://www.thymeleaf.org">
 
 <head>
+<<<<<<< HEAD
 	<meta charset="UTF-8">
 	<title>오늘뭐먹지 - 로그인</title>
 	<link rel="stylesheet" th:href="@{/css/style.css}">
+=======
+   <meta charset="UTF-8">
+   <title>오늘뭐먹지 - 로그인</title>
+   <link rel="stylesheet" th:href="@{/css/style.css}">
+>>>>>>> d00555a7e09843903191ef38cdbad58bd04b590c
 </head>
 
 <body>
 
+<<<<<<< HEAD
 	<header th:replace="~{fragments/layout :: header}">
 	</header>
 
@@ -78,6 +85,77 @@
 		});
 	
 	</script>
+=======
+   <header th:replace="~{fragments/layout :: header}">
+   </header>
+
+   <div class="container-sm">
+
+      <div style="text-align:center; margin-bottom:32px;">
+         <div style="font-size:2.5rem; margin-bottom:8px;">🍽</div>
+         <div style="font-size:1.5rem; font-weight:bold; color:#2c3e50;">오늘뭐먹지</div>
+         <div class="text-muted text-sm mt-8">맛집 후기를 공유하는 커뮤니티</div>
+      </div>
+
+      <div class="card">
+      <form th:action="@{/member/login}" method="post">
+
+         <div class="form-group">
+            <label>아이디</label>
+            <input name="memberLoginId" class="form-control" type="text" placeholder="아이디를 입력하세요">
+         </div>
+
+         <div class="form-group">
+            <label>비밀번호</label>
+            <input name="memberPwd" class="form-control" type="password" placeholder="비밀번호를 입력하세요">
+         </div>
+
+         <div th:if="${errorMsg != null}" th:text="${errorMsg}"
+            style="color:#e74c3c; font-size:0.85rem; margin-top:8px; margin-bottom:8px;">
+         </div>
+            <button type="submit" class="btn btn-primary btn-block mt-8">로그인</button>
+         </form>
+
+         <div class="divider-text mt-16">또는</div>
+
+         <div style="display:flex; flex-direction:column; gap:10px; margin-top:16px;">
+            
+               <button class="btn btn-kakao" id="btn-kakao-login" type="button">
+                  <span style="font-size:1.1rem;">💬</span> 카카오로 로그인
+               </button>
+            
+            <a th:href="@{/member/google}">
+               <button class="btn btn-google">
+                  <span style="font-size:1.1rem;">G</span> 구글로 로그인
+               </button>
+            </a>
+         </div>
+
+         <div class="text-center mt-16 text-sm text-muted">
+            아직 회원이 아니신가요?
+            <a th:href="@{/member/join-form}" style="color:#4a90d9; text-decoration:none; font-weight:bold;">
+               회원가입</a>
+         </div>
+         </div>
+   </div>
+
+   <footer th:replace="~{fragments/layout :: footer}"></footer>
+   <!--카카오 공식 cdn 주소-->
+   <script src="https://t1.kakaocdn.net/kakao_js_sdk/2.7.2/kakao.min.js"></script>
+   <script>
+      // kakao sdk 초기화 - js키로 인증(REST API 키가 아님!)
+      Kakao.init('958fbbcaa7fe028817e2cd25b2729fce');   
+      
+      // [카카오로 로그인] 버튼 클릭 이벤트
+      document.getElementById("btn-kakao-login").addEventListener('click', function(){
+         // 카카오 로그인 페이지 이동 후, 로그인 성공 시 redirectUri로 인가코드를 전달
+         Kakao.Auth.authorize({
+            redirectUri:"http://localhost:8810/member/kakao/callback"
+         });
+      });
+   
+   </script>
+>>>>>>> d00555a7e09843903191ef38cdbad58bd04b590c
 </body>
 
 </html>

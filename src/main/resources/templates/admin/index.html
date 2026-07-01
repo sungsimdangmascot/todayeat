@@ -182,6 +182,7 @@
 						</tr>
 					</thead>
 					<tbody>
+<<<<<<< HEAD
 						<tr th:each="member:${withdrawList}">
 							<td th:text="${member.memberId}">11</td>
 							<td th:text="${member.memberLoginId.startsWith('kakao_') or 
@@ -203,6 +204,23 @@
 							<td colspan="6" style="text-align: center; padding: 20px; color:#999;">
 								탈퇴 신청이 없습니다.
 							</td>
+=======
+						<tr>
+							<td>11</td>
+							<td>lee_old</td>
+							<td>이순신</td>
+							<td>lee.old@email.com</td>
+							<td>2025.03.02</td>
+							<td><button class="btn btn-danger btn-sm">탈퇴 승인(삭제)</button></td>
+						</tr>
+						<tr>
+							<td>23</td>
+							<td>—</td>
+							<td>강감찬</td>
+							<td>kang@kakao.com</td>
+							<td>2025.03.18</td>
+							<td><button class="btn btn-danger btn-sm">탈퇴 승인(삭제)</button></td>
+>>>>>>> d00555a7e09843903191ef38cdbad58bd04b590c
 						</tr>
 					</tbody>
 				</table>
@@ -228,6 +246,7 @@
 						</tr>
 					</thead>
 					<tbody>
+<<<<<<< HEAD
 						<tr th:each="post : ${postList}">
 							<td th:text="${post.postId}">5</td>
 							<td>
@@ -253,6 +272,58 @@
 							</td>
 						</tr>
 						
+=======
+						<tr>
+							<td>5</td>
+							<td><a href="02_detail.html" style="color:#4a90d9; text-decoration:none;">을지로 노포 곱창집, 진짜 현지
+									맛이에요</a></td>
+							<td>홍길동</td>
+							<td><span class="stars-sm">★★★★★</span></td>
+							<td>24</td>
+							<td>2025.04.23</td>
+							<td><button class="btn btn-danger btn-sm">삭제</button></td>
+						</tr>
+						<tr>
+							<td>4</td>
+							<td><a href="02_detail.html" style="color:#4a90d9; text-decoration:none;">강남역 직장인 점심 맛집
+									추천</a></td>
+							<td>김철수</td>
+							<td><span class="stars-sm">★★★★☆</span></td>
+							<td>18</td>
+							<td>2025.04.22</td>
+							<td><button class="btn btn-danger btn-sm">삭제</button></td>
+						</tr>
+						<tr>
+							<td>3</td>
+							<td><a href="02_detail.html" style="color:#4a90d9; text-decoration:none;">홍대 분위기 좋은 파스타 맛집
+									발견!</a></td>
+							<td>이영희</td>
+							<td><span class="stars-sm">★★★★☆</span></td>
+							<td>12</td>
+							<td>2025.04.21</td>
+							<td><button class="btn btn-danger btn-sm">삭제</button></td>
+						</tr>
+						<tr>
+							<td>2</td>
+							<td><a href="02_detail.html" style="color:#4a90d9; text-decoration:none;">성수동 브런치 카페 솔직
+									후기</a></td>
+							<td>박민준</td>
+							<td><span class="stars-sm">★★★☆☆</span></td>
+							<td>5</td>
+							<td>2025.04.20</td>
+							<td><button class="btn btn-danger btn-sm">삭제</button></td>
+						</tr>
+						<tr>
+							<td>1</td>
+							<td><a href="02_detail.html" style="color:#4a90d9; text-decoration:none;">마포 돼지갈비 — 가성비 최고
+									고기집</a></td>
+							<td>최수진</td>
+							<td><span class="stars-sm">★★★★★</span></td>
+							<td>31</td>
+							<td>2025.04.19</td>
+							<td><button class="btn btn-danger btn-sm">삭제</button></td>
+						</tr>
+>>>>>>> d00555a7e09843903191ef38cdbad58bd04b590c
 					</tbody>
 				</table>
 			</div>
@@ -276,6 +347,7 @@
 						</tr>
 					</thead>
 					<tbody>
+<<<<<<< HEAD
 						<tr th:each="comment:${commentList}">
 							<td th:text="${comment.commentId}">1</td>
 							<td th:text="${comment.commentContent}">댓글 내용</td>
@@ -296,6 +368,35 @@
 							</td>
 						</tr>
 						
+=======
+						<tr>
+							<td>1204</td>
+							<td>여기 진짜 맛있어요! 저도 다녀왔는데 강추합니다 👍</td>
+							<td>김철수</td>
+							<td><a href="02_detail.html" style="color:#4a90d9; text-decoration:none;">을지로 노포 곱창집, 진짜 현지
+									맛이에요</a></td>
+							<td>2025.04.23</td>
+							<td><button class="btn btn-danger btn-sm">삭제</button></td>
+						</tr>
+						<tr>
+							<td>1203</td>
+							<td>주차는 어디에 하면 되나요?</td>
+							<td>이영희</td>
+							<td><a href="02_detail.html" style="color:#4a90d9; text-decoration:none;">강남역 직장인 점심 맛집
+									추천</a></td>
+							<td>2025.04.22</td>
+							<td><button class="btn btn-danger btn-sm">삭제</button></td>
+						</tr>
+						<tr>
+							<td>1202</td>
+							<td>분위기 좋아 보이네요. 데이트 코스로 가봐야겠어요.</td>
+							<td>박민준</td>
+							<td><a href="02_detail.html" style="color:#4a90d9; text-decoration:none;">홍대 분위기 좋은 파스타 맛집
+									발견!</a></td>
+							<td>2025.04.21</td>
+							<td><button class="btn btn-danger btn-sm">삭제</button></td>
+						</tr>
+>>>>>>> d00555a7e09843903191ef38cdbad58bd04b590c
 					</tbody>
 				</table>
 			</div>

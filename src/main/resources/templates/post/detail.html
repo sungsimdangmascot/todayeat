@@ -2,6 +2,7 @@
 <html lang="ko" xmlns:th="http://www.thymeleaf.org">
 
 <head>
+<<<<<<< HEAD
 	<meta charset="UTF-8">
 	<title>오늘뭐먹지 - 게시글 상세</title>
 	<link rel="stylesheet" th:href="@{/css/style.css}">
@@ -150,6 +151,156 @@
 		});
 	
 	</script>
+=======
+   <meta charset="UTF-8">
+   <title>오늘뭐먹지 - 게시글 상세</title>
+   <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+
+<body>
+   <!-- 서버에서 보내준 데이터를 data-* 속성으로 저장(화면에 보이지 않음) 
+   th:attr - Thymeleaf로 여러개의 속성을 한번에 동적으로 설정 -->
+   <div id="page-data" style="display:none;"
+      th:attr="data-post-id=${post.postId}, 
+         data-logged-in=${session.loginMember != null},
+         data-lat=${post.placeLat},
+         data-lng=${post.placeLng}">       
+      
+   </div>
+
+   <header th:replace="~{fragments/layout :: header}">
+   </header>
+
+   <div class="container" style="max-width: 800px;">
+
+      <!-- 게시글 헤더 -->
+      <div class="card">
+         <div class="flex-between mb-8">
+            <h2 style="font-size:1.4rem;" th:text="${post.postTitle}">제목</h2>
+            <span class="stars" th:text="|★ ${post.postRating}|">★★★★★</span>
+         </div>
+         <div class="text-muted text-sm mb-16">
+            <span th:text="|📍 ${post.placeAddress}|"></span>
+            &nbsp;|&nbsp; 작성자: <strong th:text="${post.memberName}">홍길동</strong>
+            &nbsp;|&nbsp; <span th:text="${post.postCreatedAt}">2025.04.23</span>       
+         </div>
+
+         <!-- 대표 사진 -->
+         <!-- 사진이 있을 때 -->
+         <img th:if="${post.postImg != null}"
+             th:src="@{/upload/{img}(img=${post.postImg})}"
+             style="width:100%; height:320px; object-fit:cover; border-radius:8px; margin-bottom:20px;"
+             alt="게시글 사진">
+         
+         <!-- 사진이 없을 때 -->
+         <div th:unless="${post.postImg != null}" 
+         class="img-placeholder" 
+         style="height: 320px; margin-bottom: 20px;">
+            대표 사진 없음
+         </div>
+
+         <!-- 본문 -->
+         <p style="line-height: 1.8; color: #444;"
+            th:text="${post.postContent}">
+            내용
+         </p>
+
+         <hr class="divider">
+
+         <!-- 지도 -->
+         <div class="mb-8">
+            <strong>📍 맛집 위치</strong>
+            <!-- 장소명 표시 : 지도 위에 어느 곳인지 텍스트로 보여줌 -->
+            <span th:text="${post.placeName}"
+               style="margin-left:8px; color:#555; 
+               font-size:0.9rem;"></span>
+         </div>
+         <!-- 지도 표시 -->
+         <div id="map-detail" 
+            style="width:100%; height:280px; 
+            border-radius:8px; margin-bottom:20px;">
+         </div>
+         
+
+         <!-- 좋아요 + 수정/삭제 -->
+         <div class="flex-between">
+            <button th:class="${liked}? 'like-btn liked' : 'like-btn'"
+                  id="like-btn"
+                  onclick="toggleLike()">
+               ♥ 좋아요 &nbsp;<strong id="like-count" th:text="${likeCount}">0</strong>
+            </button>
+            <!-- 본인 게시글에만 수정, 삭제 버튼 표시 -->
+            <th:block th:if="${session.loginMember != null and session.loginMember.memberId == post.memberId}">
+            <div class="flex gap-8">
+               <a th:href="@{/post/update/{id}(id=${post.postId})}">
+                  <button class="btn btn-outline btn-sm">수정</button>
+               </a>
+               <form th:action="@{/post/delete/{id}(id=${post.postId})}"
+                  method="post"
+                  onsubmit="return confirm('게시글을 삭제하시겠습니까?')">
+                  <button type="submit" class="btn btn-danger btn-sm">삭제</button>
+               </form>
+            </div>
+            </th:block>
+         </div>
+      </div>
+
+      <!-- 댓글 -->
+      <div class="card">
+         <h3 style="margin-bottom:16px;">댓글 <span id="comment-count" style="color:#4a90d9;">0</span></h3>
+
+         <!-- 댓글 목록 컨테이너 : js가 이 안에 댓글 카드를 동적으로 작성 -->
+         <div id="comment-list"></div>
+
+         <!-- 댓글 입력 -->
+         <div style="margin-top:20px; padding-top:16px; border-top:1px solid #eee;">
+            <div class="flex gap-8">
+               <input id="comment-input" class="form-control" type="text" placeholder="댓글을 입력하세요">
+               <button type="button" class="btn btn-primary" 
+               style="white-space:nowrap;"
+               onclick="writeComment()">등록</button>
+            </div>
+         </div>
+      </div>
+
+      <a th:href="@{/}"><button class="btn btn-secondary">← 목록으로</button></a>
+
+   </div>
+
+   <footer th:replace="~{fragments/layout :: footer}"></footer>
+   
+   <!-- js 불러오기 -->
+   <script src="/js/page-data.js"></script>
+   <script src="/js/like.js"></script>
+   <script src="/js/comment.js"></script>
+   <!-- 카카오맵 SDK 로드 -->
+   <script th:src="|https://dapi.kakao.com/v2/maps/sdk.js?appkey=${kakaoKey}&libraries=services|"></script>
+
+   <script>
+      // page-data div에서 서버가 심어둔 좌표 값 읽어오기
+      var pageData = document.getElementById("page-data");
+      var lat = parseFloat(pageData.dataset.lat); // 위도
+      var lng = parseFloat(pageData.dataset.lng); // 경도
+      
+      // console.log("위도 : " + lat);
+      // console.log("경도 : " + lng);
+      
+      // 지도 초기화 - map-detail div에 카카오 지도 그리기
+      var container = document.getElementById('map-detail');
+      var options = {
+         center : new kakao.maps.LatLng(lat, lng), // 지도 중심 => 맛집 위치
+         level : 4
+      };
+      var map = new kakao.maps.Map(container, options);
+      
+      // 마커표시 - 맛집 위치 핀 꽂기
+      var marker = new kakao.maps.Marker({
+         position : new kakao.maps.LatLng(lat, lng),
+         map : map
+      });
+   
+   </script>
+>>>>>>> d00555a7e09843903191ef38cdbad58bd04b590c
 </body>
 
 </html>

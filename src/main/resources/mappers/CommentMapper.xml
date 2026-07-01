@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper
     PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
@@ -96,3 +97,75 @@
 
 
 
+=======
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.todayeat.mapper.CommentMapper">
+
+	<!-- 댓글 추가 
+		useGeneratedKeys - DB가 자동생성한 PK(comment_id)를 Java객체에 
+				다시 넣어줌
+		keyProperty="commentId" - 자동 생성된 PK를 CommentDTO의 commentId필드
+				에 저장 
+	-->
+	<insert id="write" useGeneratedKeys="true" keyProperty="commentId">
+		INSERT INTO COMMENT(POST_ID, MEMBER_ID, COMMENT_CONTENT)
+			VALUES(#{postId}, #{memberId}, #{commentContent})
+	</insert>
+	
+	<!-- 특정 게시글 댓글 가져오기 -->
+	<select id="findByPostId" parameterType="int"
+		resultType="com.todayeat.dto.CommentDTO">
+		SELECT 
+			c.COMMENT_ID,
+			c.POST_ID,
+			c.MEMBER_ID,
+			c.COMMENT_CONTENT,
+			c.COMMENT_CREATED_AT,
+			m.MEMBER_NAME
+		FROM COMMENT c
+			JOIN MEMBER m ON c.MEMBER_ID = m.MEMBER_ID
+		WHERE c.POST_ID = #{postId}
+		ORDER BY c.COMMENT_ID ASC
+	</select>
+	
+	<!-- 댓글 삭제 -->
+	<!-- WHERE 조건에 member_id와 comment_id가 같은 행 삭제 
+		 타인의 댓글 번호를 URL에 직접 입력해도 MEMBER_ID가 다르면 삭제되지 않음 -->
+	<delete id="delete">
+		DELETE FROM COMMENT
+			WHERE COMMENT_ID = #{commentId} AND MEMBER_ID = #{memberId}
+	</delete>
+	
+	<!--관리자 통계 : 전체 댓글 수 -->
+	<select id="countAllComments" resultType="int">
+		SELECT COUNT(*) FROM COMMENT
+	</select>
+	
+	<!-- 특정 게시글의 댓글 전부 삭제 -->
+	<delete id="deleteByPost" parameterType="int">
+		DELETE FROM COMMENT WHERE POST_ID = #{postId}
+	</delete>
+	<!-- 특정 회원이 쓴 댓글 전부 삭제 -->
+	<delete id="deleteByMember" parameterType="int">
+		DELETE FROM COMMENT WHERE MEMBER_ID = #{memberId}
+	</delete>
+	
+	
+
+</mapper>
+
+
+
+
+
+
+
+
+
+
+
+>>>>>>> d00555a7e09843903191ef38cdbad58bd04b590c

@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper
     PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
@@ -52,3 +53,59 @@
 
 
 
+=======
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+    
+<mapper namespace="com.todayeat.mapper.LikeMapper">
+	<!--1) 좋아요 추가 -->
+	<insert id="insert">
+		INSERT INTO POST_LIKE(POST_ID, MEMBER_ID)
+		VALUES(#{postId}, #{memberId})
+	</insert>
+	
+	<!--2) 좋아요 삭제 -->
+	<delete id="delete">
+		DELETE FROM POST_LIKE
+			WHERE POST_ID = #{postId} AND MEMBER_ID = #{memberId}
+	</delete>
+	
+	<!-- 3) 좋아요 상태 
+		결과값 : 1(좋아요 있음) 또는 0(좋아요 없음)-->
+	<select id="isLiked" resultType="int">
+		SELECT COUNT(*)
+		FROM POST_LIKE
+		WHERE POST_ID = #{postId} AND MEMBER_ID = #{memberId}
+	</select>
+	
+	<!-- 4) 좋아요 개수 -->
+	<select id="countByPostId" parameterType="int" resultType="int">
+		SELECT COUNT(*)
+		FROM POST_LIKE
+		WHERE POST_ID = #{postId}
+	</select>
+	
+	<!-- 관리자 페이지 : 회원 연쇄 삭제 -->
+	<!-- 1) 특정 게시글의 좋아요 전부 삭제-->
+	<delete id="deleteByPost" parameterType="int">
+		DELETE FROM POST_LIKE WHERE POST_ID = #{postId}
+	</delete>
+	<!-- 2) 특정 회원이 누른 좋아요 전부 삭제 -->
+	<delete id="deleteByMember" parameterType="int">
+		DELETE FROM POST_LIKE WHERE MEMBER_ID = #{memberId}
+	</delete>
+	
+	
+</mapper>
+
+
+
+
+
+
+
+
+
+>>>>>>> d00555a7e09843903191ef38cdbad58bd04b590c

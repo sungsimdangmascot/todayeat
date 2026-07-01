@@ -15,13 +15,20 @@
     <!-- 검색 -->
     <form class="search-bar" th:action="@{/}" method="get">
         <input name = "keyword" th:value="${keyword}"
+<<<<<<< HEAD
 			class="form-control" 
 			type="text" 
 			placeholder="제목과 내용을 검색하세요">
+=======
+         class="form-control" 
+         type="text" 
+         placeholder="제목과 내용을 검색하세요">
+>>>>>>> d00555a7e09843903191ef38cdbad58bd04b590c
         <button class="btn btn-primary" type="submit">검색</button>
         <a href="08_map.html"><button class="btn btn-outline">📍 내 주변 맛집</button></a>
     </form>
 
+<<<<<<< HEAD
 	<!-- 게시글이 한건도 없을때 표시할 내용 -->
 	<div th:if="${#lists.isEmpty(postList)}"
 		style="text-align:center; padding:80px 0; color:#aaa; font-size:1.1rem;">
@@ -42,13 +49,40 @@
 			 style="object-fit:cover;"
 			 alt="게시글 사진">
 		<!-- 사진이 없을 때 -->
+=======
+   <!-- 게시글이 한건도 없을때 표시할 내용 -->
+   <div th:if="${#lists.isEmpty(postList)}"
+      style="text-align:center; padding:80px 0; color:#aaa; font-size:1.1rem;">
+      아직 등록된 게시글이 없습니다. 첫번째 후기를 작성해주세요!
+   </div>
+    <!-- 게시글 목록 -->
+    <a class="post-card" 
+      th:each="post : ${postList}"
+      th:href="@{/post/{id}(id=${post.postId})}">
+      <!-- 사진이 있을때 -->
+      <!-- th:src="@{/upload/{img}(img=${post.postImg})}"
+           - URL 조합 : /upload/ + postImg 값 
+           ex) postImg = "abc.jpg" => /upload/abc.jpg
+           - WebMvcConfigurer 설정에 의해 C:/upload/todayeat/abc.jpg 파일을 찾아서 응답 -->
+      <img th:if="${post.postImg != null}"
+          th:src="@{/upload/{img}(img=${post.postImg})}"
+          class="post-thumb"
+          style="object-fit:cover;"
+          alt="게시글 사진">
+      <!-- 사진이 없을 때 -->
+>>>>>>> d00555a7e09843903191ef38cdbad58bd04b590c
         <div th:unless="${post.postImg != null}" class="img-placeholder post-thumb">사진</div>
         <div class="post-info">
             <div class="post-title" th:text="${post.postTitle}">제목</div>
             <div class="post-meta" th:text="|📍 ${post.placeName}|">📍 위치 정보</div>
             <div class="post-footer">
+<<<<<<< HEAD
 				<!-- 별점 숫자로 표시 -->
 				<!--|| 안에서 문자열과 변수를 섞어서 사용 가능 -->
+=======
+            <!-- 별점 숫자로 표시 -->
+            <!--|| 안에서 문자열과 변수를 섞어서 사용 가능 -->
+>>>>>>> d00555a7e09843903191ef38cdbad58bd04b590c
                 <span class="stars-sm" th:text="|★ ${post.postRating}|">★★★★★</span>
                 <div class="post-stats">
                     <span th:text="${post.memberName}">작성자</span>
@@ -61,6 +95,7 @@
     </a>
 
     <!-- 페이지네이션 -->
+<<<<<<< HEAD
 	<!-- th:if="${pageInfo.totalPages > 0}"
 	- 게시글이 없는 경우 없으면 (totalPages = 0) 페이지 버튼 전체를 숨김
 	- 검색 결과가 없을 때 버튼이 뜨지 않게 처리 -->
@@ -114,6 +149,60 @@
         <a class="page-btn"
 		   th:if="${pageInfo.hasNextBlock}"
 		   th:href="@{/(keyword=${keyword}, page=${pageInfo.endPage + 1})}">▶</a>
+=======
+   <!-- th:if="${pageInfo.totalPages > 0}"
+   - 게시글이 없는 경우 없으면 (totalPages = 0) 페이지 버튼 전체를 숨김
+   - 검색 결과가 없을 때 버튼이 뜨지 않게 처리 -->
+    <div class="pagination" th:if="${pageInfo.totalPages > 0}">
+        <!-- 이전 블록 버튼 
+         th:if = "${pageInfo.hasPrevBlock}" : 이전 블록이 있을 때만 표시
+         page=${pageInfo.startPage-1})}  -> 현재 블록 시작 번호 바로 앞페이지로 이동
+         ex) 현재 블록이 11~20이면 startPage = 11
+             클릭 시 10페이지(이전 블록의 마지막)로 이동
+         
+         keyword를 같이 전달하는 이유 :
+          없으면 /?page=10 이 되어 검색어 사라지고 전체 목록 10페이지로 
+          이동해버림
+       -->
+      <a class="page-btn" 
+         th:if="${pageInfo.hasPrevBlock}"
+         th:href="@{/(keyword=${keyword}, page=${pageInfo.startPage-1})}">◀</a>
+        
+      <!-- 
+         페이지 번호 버튼 반복 생성
+         # numbers.sequence(시작, 끝)
+         - Thymeleaf 내장 기능
+         - 시작 ~ 끝 숫자를 순서대로 만들어주는 기능
+         ex) sequence(1, 5) -> [1, 2, 3, 4, 5]
+         
+         th:each = "p : ${#numbers.sequence(...)}"
+         - p에 1, 2, 3,.. 차례대로 담아 아래 태그 반복 출력
+         
+         th:classappend="${p == pageInfo.currentPage}? 'active' : ''"
+         - 현재 페이지 번호와 같은 버튼에만 'active' 클래스를 추가해 강조 표시
+         - ex) 현재 3페이지 -> p=3일 때만 class="page-btn active"가 됨
+         
+      -->
+       <a class="page-btn"
+         th:each="p: ${#numbers.sequence(pageInfo.startPage, pageInfo.endPage)}"
+         th:href="@{/(keyword=${keyword}, page=${p})}"
+         th:text="${p}"
+         th:classappend="${p == pageInfo.currentPage}? 'active' : ''">1
+      </a>
+      <!--
+      <a class="page-btn active" href="#">1</a>
+        <a class="page-btn" href="#">2</a>
+      -->
+        
+      <!--다음 블록 버튼
+         page=${pageInfo.endPage + 1})} 현재 블록 끝 번호 다음 페이지로 이동
+         ex) 현재 블록이 1~5 이면 endPage = 5,
+         클릭 시 6페이지(다음 블록의 첫번째)로 이동
+      -->
+        <a class="page-btn"
+         th:if="${pageInfo.hasNextBlock}"
+         th:href="@{/(keyword=${keyword}, page=${pageInfo.endPage + 1})}">▶</a>
+>>>>>>> d00555a7e09843903191ef38cdbad58bd04b590c
     </div>
 
 </div>

@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper
     PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
@@ -33,3 +34,40 @@
 
 
 
+=======
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+    
+<mapper namespace="com.todayeat.mapper.PlaceMapper">
+	<!--
+		카카오 맵 장소 ID로 기존 장소 조회
+	-->
+	<select id="findByKakaoId" resultType="com.todayeat.dto.PlaceDTO">
+		SELECT PLACE_ID, KAKAO_PLACE_ID, PLACE_NAME, PLACE_ADDRESS,
+			PLACE_LAT, PLACE_LNG
+		FROM PLACE
+		WHERE KAKAO_PLACE_ID = #{kakaoPlaceId}
+	</select>
+
+
+	<!-- 새 장소 저장 -->
+	<insert id="save" useGeneratedKeys="true" keyProperty="placeId">
+		INSERT INTO PLACE(KAKAO_PLACE_ID, PLACE_NAME, PLACE_ADDRESS, 
+			PLACE_LAT, PLACE_LNG) 
+		VALUES(#{kakaoPlaceId}, #{placeName}, #{placeAddress}, 
+			#{placeLat}, #{placeLng})
+	</insert>
+
+
+
+
+</mapper>
+
+
+
+
+
+
+>>>>>>> d00555a7e09843903191ef38cdbad58bd04b590c
